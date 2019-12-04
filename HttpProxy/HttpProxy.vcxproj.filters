@@ -1,0 +1,61 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="InetUtils.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="ServerSocket.cpp" />
+    <ClCompile Include="ProcessingConnections\EstablishedConnection.cpp">
+      <Filter>ProcessingConnections</Filter>
+    </ClCompile>
+    <ClCompile Include="HttpProxy.cpp" />
+    <ClCompile Include="HttpContext.cpp" />
+    <ClCompile Include="ProcessingConnections\HttpRequest.cpp">
+      <Filter>ProcessingConnections</Filter>
+    </ClCompile>
+    <ClCompile Include="ThirdParty\picohttpparser.c">
+      <Filter>ThirdParty</Filter>
+    </ClCompile>
+    <ClCompile Include="ProcessingConnections\CachingConnection.cpp">
+      <Filter>ProcessingConnections</Filter>
+    </ClCompile>
+    <ClCompile Include="ProcessingConnections\CachedConnection.cpp">
+      <Filter>ProcessingConnections</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="InetUtils.h" />
+    <ClInclude Include="ServerSocket.h" />
+    <ClInclude Include="HttpProxy.h" />
+    <ClInclude Include="ProcessingConnections\EstablishedConnection.h">
+      <Filter>ProcessingConnections</Filter>
+    </ClInclude>
+    <ClInclude Include="HttpContext.h" />
+    <ClInclude Include="FdRegistrar.hpp" />
+    <ClInclude Include="ProcessingConnections\HttpRequest.h">
+      <Filter>ProcessingConnections</Filter>
+    </ClInclude>
+    <ClInclude Include="ThirdParty\picohttpparser.h">
+      <Filter>ThirdParty</Filter>
+    </ClInclude>
+    <ClInclude Include="ProcessingConnections\ErrorConnection.hpp">
+      <Filter>ProcessingConnections</Filter>
+    </ClInclude>
+    <ClInclude Include="ProcessingConnections\CachingConnection.h">
+      <Filter>ProcessingConnections</Filter>
+    </ClInclude>
+    <ClInclude Include="ProcessingConnections\ProcessingStatesUnion.hpp">
+      <Filter>ProcessingConnections</Filter>
+    </ClInclude>
+    <ClInclude Include="ProcessingConnections\CachedConnection.h">
+      <Filter>ProcessingConnections</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="ProcessingConnections">
+      <UniqueIdentifier>{1e2e70e3-ad3e-458d-a94a-b27a66a7b007}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ThirdParty">
+      <UniqueIdentifier>{0f9a6f07-c6e4-49ef-8b34-c4044b358958}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
