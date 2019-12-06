@@ -86,9 +86,11 @@
     <ClCompile Include="HttpContext.cpp" />
     <ClCompile Include="HttpProxy.cpp" />
     <ClCompile Include="ThirdParty\picohttpparser.c" />
+    <ClCompile Include="WorkerThreadData.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Cache.h" />
+    <ClInclude Include="CacheEntry.h" />
     <ClInclude Include="FdPoller.hpp" />
     <ClInclude Include="FdRegistrar.hpp" />
     <ClInclude Include="InetUtils.h" />
@@ -102,10 +104,11 @@
     <ClInclude Include="HttpProxy.h" />
     <ClInclude Include="HttpContext.h" />
     <ClInclude Include="ThirdParty\picohttpparser.h" />
+    <ClInclude Include="WorkerThreadData.h" />
   </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <CppLanguageStandard>c++11</CppLanguageStandard>
+      <CppLanguageStandard>c++17</CppLanguageStandard>
     </ClCompile>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

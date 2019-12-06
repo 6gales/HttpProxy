@@ -1,5 +1,4 @@
 #include <iostream>
-#include <cstdlib>
 #include "HttpProxy.h"
 
 int main(int argc, char **argv)

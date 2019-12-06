@@ -21,6 +21,7 @@
     <ClCompile Include="ProcessingConnections\CachedConnection.cpp">
       <Filter>ProcessingConnections</Filter>
     </ClCompile>
+    <ClCompile Include="WorkerThreadData.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="InetUtils.h" />
@@ -49,6 +50,8 @@
     <ClInclude Include="ProcessingConnections\CachedConnection.h">
       <Filter>ProcessingConnections</Filter>
     </ClInclude>
+    <ClInclude Include="CacheEntry.h" />
+    <ClInclude Include="WorkerThreadData.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="ProcessingConnections">

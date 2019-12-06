@@ -23,8 +23,6 @@ private:
 	FdRegistrar& registrar;
 	Cache& cache;
 
-	bool finished = false;
-
 public:
 	HttpContext(int sockfd, FdRegistrar& _registrar, Cache& _cache);
 
