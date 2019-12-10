@@ -2,58 +2,43 @@
 #include <list>
 #include <unordered_set>
 #include <pthread.h>
-#include "FdPoller.hpp"
-#include "HttpContext.h"
-
+#include "FdPoller.h"
+#include "Connections/HttpRequest.h"
 
 class WorkerThreadData
 {
-	std::unordered_set<int> fds;
 	FdPoller poller;
-	std::list<HttpContext*> contexts;
+	Cache& cache;
 
 	pthread_cond_t hasWork;
+	pthread_mutexattr_t recursiveAttr;
 	pthread_mutex_t mutex;
 
 public:
-	WorkerThreadData()
+	WorkerThreadData(Cache& _cache) : cache(_cache)
 	{
-		pthread_mutex_init(&mutex, NULL);
+		pthread_mutexattr_init(&recursiveAttr);
+		pthread_mutexattr_settype(&recursiveAttr, PTHREAD_MUTEX_RECURSIVE);
+
+		pthread_mutex_init(&mutex, &recursiveAttr);
+
 		pthread_cond_init(&hasWork, NULL);
 	}
 
-	size_t getLodaing()
-	{
-		return fds.size();
-	}
+	size_t getLodaing();
 
-	void enqueue(int fd)
-	{
-		fds.insert(fd);
-	}
+	void enqueue(AbstractConnection* connection);
 
-	void waitWork()
-	{
-		pthread_mutex_lock(&mutex);
-		
-		while (fds.size() == 0)
-		{
-			pthread_cond_wait(&hasWork, &mutex);
-		}
+	void enqueue(int fd);
 
-		pthread_mutex_unlock(&mutex);
-	}
+	void waitWork();
+
+	int poll();
 
 	~WorkerThreadData()
 	{
+		pthread_mutexattr_destroy(&recursiveAttr);
 		pthread_mutex_destroy(&mutex);
 		pthread_cond_destroy(&hasWork);
-
-		for (auto it = contexts.begin(); it != contexts.end(); ++it)
-		{
-			delete *it;
-			*it = nullptr;
-			contexts.erase(it--);
-		}
 	}
 };

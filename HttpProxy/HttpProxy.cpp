@@ -3,64 +3,29 @@
 #include <iostream>
 #include <algorithm>
 #include <string.h>
-#include <fcntl.h>
-#include "InetUtils.h"
+
+void HttpProxy::work(size_t id)
+{
+	std::cout << "Thread #" << id << " started" << std::endl;
+
+	while (true)
+	{
+		datas[id]->waitWork();
+		datas[id]->poll();
+	}
+}
 
 void HttpProxy::run()
 {
 	std::cerr << "Proxy started" << std::endl;
 
-	while (true)
+	ThreadInfo threadInfos[threadNum - 1];
+	for (size_t i = 0; i < threadNum - 1; i++)
 	{
-		//if (contexts.size())
-		//{
-		//	registrar.registerFd(4, FdRegistrar::Options::Both);
-		//}
-		//registrar.registerFd(servSock.getFd(), FdRegistrar::Options::Read);
-		//
-		//if (registrar.selectFds() < 0)
-		//{
-		//	throw std::runtime_error(std::string("select: ") + strerror(errno));
-		//}
-		//
-		//if (registrar.isSetRead(servSock.getFd()))
-		//{
-		//	fprintf(stderr, "New client connected\n");
-		//	int clientSock = servSock.acceptConnection();
-
-		//	contexts.push_back(new HttpContext(clientSock, registrar, cache));
-		//}
-
-		//if (contexts.size())
-		//{
-		//	fprintf(stderr, "r:%d w:%d\n", registrar.isSetRead(4), registrar.isSetWrite(4));
-		//}
-
-		//for (auto it = contexts.begin(); it != contexts.end(); ++it)
-		//{
-		//	(*it)->process();
-		//	if ((*it)->isFinished())
-		//	{
-		//		delete *it;
-		//		contexts.erase(it--);
-		//	}
-		//}
+		threadInfos[i].id = i + 1;
+		threadInfos[i].proxy = this;
+		pthread_create(&threads[i], NULL, &HttpProxy::startThread, &threadInfos[i]);
 	}
-}
 
-void HttpProxy::acceptCallback(short events)
-{
-	if (events & POLLIN)
-	{
-		fprintf(stderr, "New client connected\n");
-		int clientSock = servSock.acceptConnection();
-
-		auto it = std::min_element(datas.begin(), datas.end(),
-			[](WorkerThreadData* a, WorkerThreadData* b)
-			{
-				return a->getLodaing() < b->getLodaing();
-			});
-
-		(*it)->enqueue(clientSock);
-	}
+	work(0);
 }

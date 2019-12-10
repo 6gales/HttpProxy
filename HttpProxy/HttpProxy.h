@@ -1,37 +1,49 @@
 #pragma once
 #include <string>
-#include <netdb.h>
 #include <list>
-#include "ServerSocket.h"
-#include "FdRegistrar.hpp"
-#include "Cache.h"
-#include "HttpContext.h"
-#include "WorkerThreadData.h"
 #include <pthread.h>
+#include "Connections/ServerSocket.h"
+#include "Cache/Cache.h"
+#include "WorkerThreadData.h"
+#include "Utils/WorkerThreadLoadBalancer.hpp"
 
 class HttpProxy
 {
-	const ServerSocket servSock;
-
-	FdRegistrar registrar;
 	Cache cache;
 
 	const size_t threadNum;
 	pthread_t* threads = nullptr;
 	std::vector<WorkerThreadData*> datas;
 
+	void work(size_t id);
+
+	struct ThreadInfo
+	{
+		size_t id;
+		HttpProxy* proxy;
+	};
+
+	static void* startThread(void* threadInfo)
+	{
+		ThreadInfo* info = reinterpret_cast<ThreadInfo*>(threadInfo);
+		info->proxy->work(info->id);
+		return NULL;
+	}
+
 public:
-	HttpProxy(int lport, size_t _threads) : servSock(lport), threadNum(_threads), datas(_threads)
+	HttpProxy(int lport, size_t _threads) : datas(_threads), threadNum(_threads)
 	{
 		for (size_t i = 0; i < threadNum; i++)
 		{
-			datas.push_back(new WorkerThreadData());
+			datas[i] = new WorkerThreadData(cache);
 		}
+
+		datas[0]->enqueue(new ServerSocket(lport, new WorkerThreadLoadBalancer(datas)));
+
+		threads = new pthread_t[threadNum - 1];
 	}
 
 	void run();
-
-	void acceptCallback(short events);
 
 	~HttpProxy()
 	{

@@ -1,23 +1,24 @@
 #pragma once
 #include <unistd.h>
 #include <string.h>
-#include "../HttpContext.h"
+#include "AbstractConnection.h"
 
-class ErrorConnection : public HttpContext::ProcessingState
+class ErrorConnection : public AbstractConnection
 {
-	const int sockFd;
 	size_t writeOffset;
 	std::string errorMessage;
 
 public:
-	ErrorConnection(int socket, std::string _errorMessage) : sockFd(socket), errorMessage(_errorMessage)
+	ErrorConnection(int _sockFd, std::string _errorMessage)
+		: AbstractConnection(_sockFd), errorMessage(_errorMessage)
 	{
+		subscribedEvents = POLLOUT;
 		writeOffset = 0;
 	}
 
-	ProcessingState* process(HttpContext* context)
+	void eventTriggeredCallback(short events) override
 	{
-		if (context->getRegistrar().isSetWrite(sockFd))
+		if (canWrite(events))
 		{
 			ssize_t bytesWrote = send(sockFd, errorMessage.c_str() + writeOffset, errorMessage.size() - writeOffset, 0);
 			if (bytesWrote < 0 && bytesWrote != EWOULDBLOCK)
@@ -31,10 +32,6 @@ public:
 		if (writeOffset == errorMessage.size())
 		{
 			finished = true;
-		}
-		else
-		{
-			context->getRegistrar().registerFd(sockFd, FdRegistrar::Options::Write);
 		}
 	}
 

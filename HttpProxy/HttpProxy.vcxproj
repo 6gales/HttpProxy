@@ -75,41 +75,48 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <ItemGroup>
-    <ClCompile Include="Cache.cpp" />
-    <ClCompile Include="InetUtils.cpp" />
+    <ClCompile Include="Cache\Cache.cpp" />
+    <ClCompile Include="Cache\CacheEntry.cpp" />
+    <ClCompile Include="Connections\CachedConnection.cpp" />
+    <ClCompile Include="Connections\CachingConnection.cpp" />
+    <ClCompile Include="Connections\EstablishedConnection.cpp" />
+    <ClCompile Include="Connections\HttpRequest.cpp" />
+    <ClCompile Include="Connections\ServerSocket.cpp" />
+    <ClCompile Include="FdPoller.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="ProcessingConnections\CachedConnection.cpp" />
-    <ClCompile Include="ProcessingConnections\CachingConnection.cpp" />
-    <ClCompile Include="ProcessingConnections\EstablishedConnection.cpp" />
-    <ClCompile Include="ProcessingConnections\HttpRequest.cpp" />
-    <ClCompile Include="ServerSocket.cpp" />
-    <ClCompile Include="HttpContext.cpp" />
     <ClCompile Include="HttpProxy.cpp" />
     <ClCompile Include="ThirdParty\picohttpparser.c" />
+    <ClCompile Include="Utils\InetUtils.cpp" />
     <ClCompile Include="WorkerThreadData.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Cache.h" />
-    <ClInclude Include="CacheEntry.h" />
-    <ClInclude Include="FdPoller.hpp" />
-    <ClInclude Include="FdRegistrar.hpp" />
-    <ClInclude Include="InetUtils.h" />
-    <ClInclude Include="ProcessingConnections\CachedConnection.h" />
-    <ClInclude Include="ProcessingConnections\CachingConnection.h" />
-    <ClInclude Include="ProcessingConnections\ErrorConnection.hpp" />
-    <ClInclude Include="ProcessingConnections\EstablishedConnection.h" />
-    <ClInclude Include="ProcessingConnections\HttpRequest.h" />
-    <ClInclude Include="ProcessingConnections\ProcessingStatesUnion.hpp" />
-    <ClInclude Include="ServerSocket.h" />
+    <ClInclude Include="Cache\Cache.h" />
+    <ClInclude Include="Cache\CacheEntry.h" />
+    <ClInclude Include="Connections\AbstractConnection.h" />
+    <ClInclude Include="Connections\CachedConnection.h" />
+    <ClInclude Include="Connections\CachingConnection.h" />
+    <ClInclude Include="Connections\ConnectionManager.h" />
+    <ClInclude Include="Connections\ErrorConnection.hpp" />
+    <ClInclude Include="Connections\EstablishedConnection.h" />
+    <ClInclude Include="Connections\HttpRequest.h" />
+    <ClInclude Include="Connections\ManagingConnection.h" />
+    <ClInclude Include="Connections\ServerSocket.h" />
+    <ClInclude Include="FdPoller.h" />
     <ClInclude Include="HttpProxy.h" />
-    <ClInclude Include="HttpContext.h" />
     <ClInclude Include="ThirdParty\picohttpparser.h" />
+    <ClInclude Include="Utils\AbstractLoadBalancer.h" />
+    <ClInclude Include="Utils\InetUtils.h" />
+    <ClInclude Include="Utils\WorkerThreadLoadBalancer.hpp" />
     <ClInclude Include="WorkerThreadData.h" />
   </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <CppLanguageStandard>c++17</CppLanguageStandard>
     </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <LibraryDependencies>pthread;%(LibraryDependencies)</LibraryDependencies>
+    </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

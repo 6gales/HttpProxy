@@ -1,64 +1,100 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="InetUtils.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="ServerSocket.cpp" />
-    <ClCompile Include="ProcessingConnections\EstablishedConnection.cpp">
-      <Filter>ProcessingConnections</Filter>
-    </ClCompile>
     <ClCompile Include="HttpProxy.cpp" />
-    <ClCompile Include="HttpContext.cpp" />
-    <ClCompile Include="ProcessingConnections\HttpRequest.cpp">
-      <Filter>ProcessingConnections</Filter>
-    </ClCompile>
     <ClCompile Include="ThirdParty\picohttpparser.c">
       <Filter>ThirdParty</Filter>
     </ClCompile>
-    <ClCompile Include="ProcessingConnections\CachingConnection.cpp">
-      <Filter>ProcessingConnections</Filter>
-    </ClCompile>
-    <ClCompile Include="ProcessingConnections\CachedConnection.cpp">
-      <Filter>ProcessingConnections</Filter>
-    </ClCompile>
     <ClCompile Include="WorkerThreadData.cpp" />
+    <ClCompile Include="Connections\CachedConnection.cpp">
+      <Filter>Connections</Filter>
+    </ClCompile>
+    <ClCompile Include="Connections\CachingConnection.cpp">
+      <Filter>Connections</Filter>
+    </ClCompile>
+    <ClCompile Include="Connections\EstablishedConnection.cpp">
+      <Filter>Connections</Filter>
+    </ClCompile>
+    <ClCompile Include="Connections\HttpRequest.cpp">
+      <Filter>Connections</Filter>
+    </ClCompile>
+    <ClCompile Include="Connections\ServerSocket.cpp">
+      <Filter>Connections</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\InetUtils.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Cache\Cache.cpp">
+      <Filter>Cache</Filter>
+    </ClCompile>
+    <ClCompile Include="Cache\CacheEntry.cpp">
+      <Filter>Cache</Filter>
+    </ClCompile>
+    <ClCompile Include="FdPoller.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="InetUtils.h" />
-    <ClInclude Include="ServerSocket.h" />
     <ClInclude Include="HttpProxy.h" />
-    <ClInclude Include="ProcessingConnections\EstablishedConnection.h">
-      <Filter>ProcessingConnections</Filter>
-    </ClInclude>
-    <ClInclude Include="HttpContext.h" />
-    <ClInclude Include="FdRegistrar.hpp" />
-    <ClInclude Include="ProcessingConnections\HttpRequest.h">
-      <Filter>ProcessingConnections</Filter>
-    </ClInclude>
     <ClInclude Include="ThirdParty\picohttpparser.h">
       <Filter>ThirdParty</Filter>
     </ClInclude>
-    <ClInclude Include="ProcessingConnections\ErrorConnection.hpp">
-      <Filter>ProcessingConnections</Filter>
-    </ClInclude>
-    <ClInclude Include="ProcessingConnections\CachingConnection.h">
-      <Filter>ProcessingConnections</Filter>
-    </ClInclude>
-    <ClInclude Include="ProcessingConnections\ProcessingStatesUnion.hpp">
-      <Filter>ProcessingConnections</Filter>
-    </ClInclude>
-    <ClInclude Include="ProcessingConnections\CachedConnection.h">
-      <Filter>ProcessingConnections</Filter>
-    </ClInclude>
-    <ClInclude Include="CacheEntry.h" />
     <ClInclude Include="WorkerThreadData.h" />
+    <ClInclude Include="Connections\AbstractConnection.h">
+      <Filter>Connections</Filter>
+    </ClInclude>
+    <ClInclude Include="Connections\CachedConnection.h">
+      <Filter>Connections</Filter>
+    </ClInclude>
+    <ClInclude Include="Connections\CachingConnection.h">
+      <Filter>Connections</Filter>
+    </ClInclude>
+    <ClInclude Include="Connections\ConnectionManager.h">
+      <Filter>Connections</Filter>
+    </ClInclude>
+    <ClInclude Include="Connections\ErrorConnection.hpp">
+      <Filter>Connections</Filter>
+    </ClInclude>
+    <ClInclude Include="Connections\EstablishedConnection.h">
+      <Filter>Connections</Filter>
+    </ClInclude>
+    <ClInclude Include="Connections\HttpRequest.h">
+      <Filter>Connections</Filter>
+    </ClInclude>
+    <ClInclude Include="Connections\ManagingConnection.h">
+      <Filter>Connections</Filter>
+    </ClInclude>
+    <ClInclude Include="Connections\ServerSocket.h">
+      <Filter>Connections</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\AbstractLoadBalancer.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\InetUtils.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\WorkerThreadLoadBalancer.hpp">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Cache\Cache.h">
+      <Filter>Cache</Filter>
+    </ClInclude>
+    <ClInclude Include="Cache\CacheEntry.h">
+      <Filter>Cache</Filter>
+    </ClInclude>
+    <ClInclude Include="FdPoller.h" />
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="ProcessingConnections">
-      <UniqueIdentifier>{1e2e70e3-ad3e-458d-a94a-b27a66a7b007}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ThirdParty">
       <UniqueIdentifier>{0f9a6f07-c6e4-49ef-8b34-c4044b358958}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Connections">
+      <UniqueIdentifier>{1e2e70e3-ad3e-458d-a94a-b27a66a7b007}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Cache">
+      <UniqueIdentifier>{150ba831-d0c3-4af9-91ae-f2d7a791ad94}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utils">
+      <UniqueIdentifier>{1d86bc0e-b6cb-47fe-8c99-db747b038271}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
