@@ -31,7 +31,7 @@ class HttpProxy
 	}
 
 public:
-	HttpProxy(int lport, size_t _threads) : datas(_threads), threadNum(_threads)
+	HttpProxy(int lport, size_t _threads) : threadNum(_threads), datas(_threads)
 	{
 		for (size_t i = 0; i < threadNum; i++)
 		{

@@ -48,6 +48,7 @@ void HttpRequest::eventTriggeredCallback(short events)
 	if (readRequest)
 	{
 		parseRequest();
+		finished = true;
 	}
 
 

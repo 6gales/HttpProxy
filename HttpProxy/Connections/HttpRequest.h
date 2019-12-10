@@ -30,7 +30,7 @@ public:
 
 	~HttpRequest()
 	{
-		if (finished)
+		if (eof && !readRequest)
 		{
 			fprintf(stderr, "close fd\n");
 			close(sockFd);

@@ -22,7 +22,7 @@
 //	if (d("full write", d("is write to:", context->getRegistrar().isSetWrite(toFd)) && buffer.hasData()))
 //	{
 //		ssize_t bytesWrote = send(toFd, buffer.getUnread(), buffer.countUnread(), 0);
-//		if (bytesWrote < 0 && bytesWrote != EWOULDBLOCK)
+//		if (bytesWrote < 0 && errno != EWOULDBLOCK)
 //		{
 //			throw std::runtime_error(std::string("send: ") + strerror(errno));
 //		}

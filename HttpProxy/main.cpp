@@ -18,6 +18,6 @@ int main(int argc, char **argv)
 		return 1;
 	}
 	
-	HttpProxy proxy{ lport, threads };
+	HttpProxy proxy{ lport, static_cast<size_t>(threads) };
 	proxy.run();
 }

@@ -7,12 +7,32 @@
 
 class FdPoller : public ConnectionManager
 {
+	pthread_mutex_t connectionLock;
+	pthread_mutexattr_t recursiveAttr;
+
 	std::unordered_map<int, AbstractConnection*> connections;
 	std::vector<struct pollfd> subscribedFds;
+
+	std::vector<AbstractConnection*> insertList;
+	std::vector<int> deleteList;
+
 	bool isChanged;
+	bool inForEach = false;
+
+	void emptyLists();
 
 public:
-	size_t connectionsSize() { return connections.size(); }
+	FdPoller()
+	{
+		pthread_mutexattr_init(&recursiveAttr);
+		pthread_mutexattr_settype(&recursiveAttr, PTHREAD_MUTEX_RECURSIVE);
+
+		pthread_mutex_init(&connectionLock, &recursiveAttr);
+	}
+
+	size_t connectionsSize();
+
+	pthread_mutex_t* getLock() { return &connectionLock; }
 
 	void addConnection(AbstractConnection* connection) override;
 
@@ -20,5 +40,17 @@ public:
 
 	bool isConnectionFinished(int sockFd) override;
 
-	int pollFds(pthread_mutex_t* unlockOnPoll);
+	int pollFds();
+
+	~FdPoller()
+	{
+		pthread_mutexattr_destroy(&recursiveAttr);
+		pthread_mutex_destroy(&connectionLock);
+
+		for (auto it = connections.begin(); it != connections.end(); ++it)
+		{
+			delete it->second;
+		}
+		connections.clear();
+	}
 };

@@ -10,11 +10,6 @@ ssize_t CacheEntry::writeToRecord(int sockFd)
 
 	if (bytesRead > 0)
 	{
-		if (record.capacity() < record.size() + bytesRead)
-		{
-			record.resize(record.size() + bytesRead);
-		}
-
 		for (size_t i = 0; i < bytesRead; i++)
 		{
 			record.push_back(buffer[i]);
@@ -40,7 +35,11 @@ ssize_t CacheEntry::readFromRecord(ManagingConnection* reader, size_t offset)
 
 	if (record.size() == offset)
 	{
-		waitData(reader);
+		if (!isFull)
+		{
+			waitData(reader);
+		}
+		pthread_rwlock_unlock(&rwlock);
 		return 0;
 	}
 

@@ -31,7 +31,7 @@ public:
 		pthread_mutex_lock(&cacheLock);
 
 		auto it = cache.find(key);
-		if (it != cache.end())
+		if (it == cache.end())
 		{
 			pthread_mutex_unlock(&cacheLock);
 			throw std::invalid_argument(key + " not found in cache");
