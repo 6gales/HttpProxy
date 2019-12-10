@@ -24,7 +24,7 @@ public:
 
 	void enqueue(int fd);
 
-	void waitWork();
+	void waitWork(size_t id);
 
 	int poll();
 

@@ -29,6 +29,6 @@ void CachingConnection::eventTriggeredCallback(short events)
 			throw std::runtime_error(std::string("recv: ") + strerror(errno));
 		}
 		
-		finished = bytesRead == 0;
+		finished = bytesRead == 0;//TODO isCompleted?
 	}
 }

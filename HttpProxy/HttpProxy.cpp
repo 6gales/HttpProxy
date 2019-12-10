@@ -6,12 +6,12 @@
 
 void HttpProxy::work(size_t id)
 {
-	std::cout << "Thread #" << id << " started" << std::endl;
+	fprintf(stderr, "Thread #%lu started\n", id);
 
 	while (true)
 	{
-		datas[id]->waitWork();
-		datas[id]->poll();
+		datas[id]->waitWork(id);
+		fprintf(stderr, "Thread #%lu polled %d\n", id, datas[id]->poll());
 	}
 }
 
