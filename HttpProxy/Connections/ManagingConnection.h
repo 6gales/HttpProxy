@@ -12,15 +12,9 @@ public:
 
 	virtual void eventTriggeredCallback(short events) override = 0;
 
-	void suspendFromPoll()
-	{
-		manager.removeConnection(sockFd);
-	}
+	virtual void suspendFromPoll() = 0;
 
-	void restoreToPoll()
-	{
-		manager.addConnection(this);
-	}
+	virtual void restoreToPoll() = 0;
 
 	virtual ~ManagingConnection() {}
 };

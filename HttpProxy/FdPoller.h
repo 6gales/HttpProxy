@@ -53,4 +53,9 @@ public:
 		}
 		connections.clear();
 	}
+
+	void subscriptionChanged() override
+	{
+		isChanged = true;
+	}
 };

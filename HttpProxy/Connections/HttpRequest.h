@@ -36,4 +36,8 @@ public:
 			close(sockFd);
 		}
 	}
+
+	// Inherited via ManagingConnection
+	virtual void suspendFromPoll() override;
+	virtual void restoreToPoll() override;
 };

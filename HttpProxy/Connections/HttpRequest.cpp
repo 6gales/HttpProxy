@@ -1,6 +1,6 @@
 #include "HttpRequest.h"
 #include <netinet/in.h>
-//#include "EstablishedConnection.h"
+#include "DirectConnection.h"
 #include "ErrorConnection.hpp"
 #include "CachingConnection.h"
 #include "CachedConnection.h"
@@ -58,6 +58,14 @@ void HttpRequest::eventTriggeredCallback(short events)
 	}
 }
 
+void HttpRequest::suspendFromPoll()
+{
+}
+
+void HttpRequest::restoreToPoll()
+{
+}
+
 void HttpRequest::parseRequest()
 {
 	const char* path;
@@ -67,60 +75,65 @@ void HttpRequest::parseRequest()
 	struct phr_header headers[headerNum];
 	size_t methodLen,
 		pathLen;
-	
+
 	phr_parse_request(request.c_str(), request.size(),
 		&method, &methodLen,
 		&path, &pathLen,
 		&minorVersion, headers, &headerNum, request.size());
-	
-	if (minorVersion != 0)
+
+	//coonection header
+	std::pair<std::string, int> urlPort;
+	urlPort.second = -1;
+	for (size_t i = 0; i < headerNum; i++)
 	{
-		manager.addConnection(new ErrorConnection(sockFd, "HTTP/1.0 505 HTTP Version Not Supported\r\n\r\n"));
+		if (!strncmp(headers[i].name, "Host",
+			headers[i].name_len < 4 ? headers[i].name_len : 4))
+		{
+			urlPort = parseHost(std::string(headers[i].value, headers[i].value_len));
+			break;
+		}
+	}
+	//if no HOST param
+	if (urlPort.second < 0)
+	{
+		manager.addConnection(new ErrorConnection(sockFd, "HTTP/1.0 404 Not Found\r\n\r\n"));
 		return;
 	}
 
-	if (!strncmp(method, "GET", 3))
+	int servFd = openRedirectedSocket(urlPort.first, urlPort.second);
+
+	if (minorVersion != 0 || !strncmp(method, "GET", 3))
 	{
-		//coonection header
-		std::pair<std::string, int> urlPort;
-		urlPort.second = -1;
-		for (size_t i = 0; i < headerNum; i++)
-		{
-			if (!strncmp(headers[i].name, "Host",
-				headers[i].name_len < 4 ? headers[i].name_len : 4))
-			{
-				urlPort = parseHost(std::string(headers[i].value, headers[i].value_len));
-				break;
-			}
-		}
-		//if no HOST param
-		if (urlPort.second < 0)
-		{
-			manager.addConnection(new ErrorConnection(sockFd, "HTTP/1.0 404 Not Found\r\n\r\n"));
-			return;
-		}
+		ConnectionBuffer* clientToServ = new ConnectionBuffer(),
+			* servToClient = new ConnectionBuffer();
+		manager.addConnection(new DirectConnection(sockFd, clientToServ, servToClient, manager));
+		manager.addConnection(new DirectConnection(servFd, servToClient, clientToServ, manager));
+		//manager.addConnection(new ErrorConnection(sockFd, "HTTP/1.0 505 HTTP Version Not Supported\r\n\r\n"));
+		return;
+	}
 
-		bool isInserted = cache.createIfNotExists(request);
-		CacheEntry& entry = cache.getEntry(request);
+	//	if (!strncmp(method, "GET", 3))
+	//	{
+	bool isInserted = cache.createIfNotExists(request);
+	CacheEntry& entry = cache.getEntry(request);
 
-		if (isInserted)
-		{
-			int servFd = openRedirectedSocket(urlPort.first, urlPort.second);
+	if (isInserted)
+	{
 
-			manager.addConnection(new CachingConnection(servFd, request, entry));
-			manager.addConnection(new CachedConnection(sockFd, manager, entry));
-			return;
-		}
-		else
-		{
-			manager.addConnection(new CachedConnection(sockFd, manager, entry));
-			return;
-		}
+		manager.addConnection(new CachingConnection(servFd, request, entry));
+		manager.addConnection(new CachedConnection(sockFd, manager, entry));
+		return;
 	}
 	else
 	{
-		fprintf(stderr, "Error connection 501\n");
-		manager.addConnection(new ErrorConnection(sockFd, "HTTP/1.0 501 Not Implemented\r\n\r\n"));
+		manager.addConnection(new CachedConnection(sockFd, manager, entry));
 		return;
 	}
+	//}
+	//else
+	//{
+	//	fprintf(stderr, "Error connection 501\n");
+	//	manager.addConnection(new ErrorConnection(sockFd, "HTTP/1.0 501 Not Implemented\r\n\r\n"));
+	//	return;
+	//}
 }

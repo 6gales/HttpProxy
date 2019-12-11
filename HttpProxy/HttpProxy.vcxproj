@@ -79,7 +79,7 @@
     <ClCompile Include="Cache\CacheEntry.cpp" />
     <ClCompile Include="Connections\CachedConnection.cpp" />
     <ClCompile Include="Connections\CachingConnection.cpp" />
-    <ClCompile Include="Connections\EstablishedConnection.cpp" />
+    <ClCompile Include="Connections\DirectConnection.cpp" />
     <ClCompile Include="Connections\HttpRequest.cpp" />
     <ClCompile Include="Connections\ServerSocket.cpp" />
     <ClCompile Include="FdPoller.cpp" />
@@ -97,7 +97,7 @@
     <ClInclude Include="Connections\CachingConnection.h" />
     <ClInclude Include="Connections\ConnectionManager.h" />
     <ClInclude Include="Connections\ErrorConnection.hpp" />
-    <ClInclude Include="Connections\EstablishedConnection.h" />
+    <ClInclude Include="Connections\DirectConnection.h" />
     <ClInclude Include="Connections\HttpRequest.h" />
     <ClInclude Include="Connections\ManagingConnection.h" />
     <ClInclude Include="Connections\ServerSocket.h" />

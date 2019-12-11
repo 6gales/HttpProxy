@@ -10,5 +10,7 @@ public:
 
 	virtual bool isConnectionFinished(int sockFd) = 0;
 
+	virtual void subscriptionChanged() = 0;
+
 	virtual ~ConnectionManager() {}
 };

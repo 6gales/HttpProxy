@@ -19,6 +19,16 @@ public:
 
 	void eventTriggeredCallback(short events) override;
 
+	void suspendFromPoll() override
+	{
+		manager.removeConnection(sockFd);
+	}
+
+	void restoreToPoll() override
+	{
+		manager.addConnection(this);
+	}
+
 	~CachedConnection()
 	{
 		close(sockFd);
