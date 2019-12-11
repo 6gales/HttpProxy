@@ -83,7 +83,7 @@ int FdPoller::pollFds()
 		{
 			struct pollfd poller;
 			poller.fd = conn->first;
-			poller.events = conn->second->getSubscribedEvents();//subscribed events
+			poller.events = conn->second->getSubscribedEvents() | POLLERR | POLLHUP | POLLNVAL;
 			subscribedFds.emplace_back(poller);
 		}
 		
@@ -94,6 +94,7 @@ int FdPoller::pollFds()
 	do
 	{
 		polled = poll(subscribedFds.data(), subscribedFds.size(), -1);
+		fprintf(stderr, "Polled %d\n", polled);
 
 	} while (polled == 0);
 
@@ -113,10 +114,19 @@ int FdPoller::pollFds()
 			auto it = connections.find(subscribedFds[i].fd);
 			if (it != connections.end())
 			{
-				it->second->eventTriggeredCallback(subscribedFds[i].revents);
-				if (it->second->isFinished())
+				try
 				{
-					fprintf(stderr, "Deleting in poll %x\n", it->second);
+					it->second->eventTriggeredCallback(subscribedFds[i].revents);
+					if (it->second->isFinished())
+					{
+						fprintf(stderr, "Deleting in poll %x\n", it->second);
+						delete it->second;
+						connections.erase(it);
+					}
+				}
+				catch (std::exception e)
+				{
+					fprintf(stderr, "Error occured: %s\n", e.what());
 					delete it->second;
 					connections.erase(it);
 				}

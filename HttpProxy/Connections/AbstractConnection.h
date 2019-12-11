@@ -18,6 +18,21 @@ protected:
 		return events & POLLOUT;
 	}
 
+	bool isHangedUp(short events)
+	{
+		return events & POLLHUP;
+	}
+
+	bool isErrorOccuerd(short events)
+	{
+		return events & POLLERR;
+	}
+
+	bool isInvalid(short events)
+	{
+		return events & POLLNVAL;
+	}
+
 public:
 	AbstractConnection(int _sockFd) : sockFd(_sockFd) {}
 

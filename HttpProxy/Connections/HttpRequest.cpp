@@ -102,7 +102,7 @@ void HttpRequest::parseRequest()
 
 	int servFd = openRedirectedSocket(urlPort.first, urlPort.second);
 
-	if (minorVersion != 0 || !strncmp(method, "GET", 3))
+	if (minorVersion != 0 || strncmp(method, "GET", 3))
 	{
 		ConnectionBuffer* clientToServ = new ConnectionBuffer(),
 			* servToClient = new ConnectionBuffer();

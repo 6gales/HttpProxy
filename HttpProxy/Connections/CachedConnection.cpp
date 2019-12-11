@@ -3,6 +3,13 @@
 
 void CachedConnection::eventTriggeredCallback(short events)
 {
+	if (isHangedUp(events) || isErrorOccuerd(events) || isInvalid(events))
+	{
+		fprintf(stderr, "Client disconnected\n");
+		finished = true;
+		return;
+	}
+
 	if (canWrite(events))
 	{
 		ssize_t bytesWrote = cacheEntry.readFromRecord(this, writeOffset);
