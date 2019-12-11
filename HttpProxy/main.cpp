@@ -9,7 +9,7 @@ int main(int argc, char **argv)
 		return 0;
 	}
 
-	int threads = (argc > 1 ? std::atoi(argv[1]) : 2),
+	int threads = (argc > 1 ? std::atoi(argv[1]) : 1),
 		lport = (argc > 2 ? std::atoi(argv[2]) : 8080);
 	
 	if (lport <= 0 || threads <= 0)
@@ -18,6 +18,6 @@ int main(int argc, char **argv)
 		return 1;
 	}
 	
-	HttpProxy proxy{ lport, static_cast<size_t>(threads) };
+	HttpProxy proxy = HttpProxy(lport, static_cast<size_t>(threads));
 	proxy.run();
 }

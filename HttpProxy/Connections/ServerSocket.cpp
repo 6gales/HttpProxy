@@ -6,6 +6,7 @@
 #include <fcntl.h>
 #include <stdexcept>
 #include <poll.h>
+#include <errno.h>
 #include "../Utils/InetUtils.h"
 
 ServerSocket::ServerSocket(int port, AbstractLoadBalancer* _loadBalancer)

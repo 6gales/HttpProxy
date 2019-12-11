@@ -12,7 +12,7 @@ class HttpProxy
 	Cache cache;
 
 	const size_t threadNum;
-	pthread_t* threads = nullptr;
+	pthread_t* threads = NULL;
 	std::vector<WorkerThreadData*> datas;
 
 	void work(size_t id);

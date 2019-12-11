@@ -1,6 +1,5 @@
 #pragma once
 #include <list>
-#include <unordered_set>
 #include <pthread.h>
 #include "FdPoller.h"
 #include "Connections/HttpRequest.h"

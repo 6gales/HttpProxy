@@ -2,6 +2,8 @@
 #include <string.h>
 #include <poll.h>
 #include <netdb.h>
+#include <stdexcept>
+#include <errno.h>
 
 void CachingConnection::eventTriggeredCallback(short events)
 {

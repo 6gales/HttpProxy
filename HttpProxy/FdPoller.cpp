@@ -1,4 +1,5 @@
 #include "FdPoller.h"
+#include <stdio.h>
 
 void FdPoller::addConnection(AbstractConnection* connection)
 {
@@ -11,7 +12,7 @@ void FdPoller::addConnection(AbstractConnection* connection)
 	}
 	else
 	{
-		auto elem = connections.find(connection->getFd());
+		std::map<int, AbstractConnection*>::iterator elem = connections.find(connection->getFd());
 
 		if (elem != connections.end())
 		{
@@ -19,7 +20,7 @@ void FdPoller::addConnection(AbstractConnection* connection)
 			fprintf(stderr, "Deleting %x\n", elem->second);
 			connections.erase(elem);
 		}
-		connections.emplace(connection->getFd(), connection);
+		connections.insert(std::make_pair(connection->getFd(), connection));
 	}
 	pthread_mutex_unlock(&connectionLock);
 }
@@ -45,7 +46,7 @@ bool FdPoller::isConnectionFinished(int sockFd)
 {
 	pthread_mutex_lock(&connectionLock);
 
-	auto it = connections.find(sockFd);
+	std::map<int, AbstractConnection*>::iterator it = connections.find(sockFd);
 	if (it != connections.end())
 	{
 		pthread_mutex_unlock(&connectionLock);
@@ -79,12 +80,12 @@ int FdPoller::pollFds()
 
 		pthread_mutex_lock(&connectionLock);
 		
-		for (auto conn = connections.begin(); conn != connections.end(); ++conn)
+		for (std::map<int, AbstractConnection*>::iterator conn = connections.begin(); conn != connections.end(); ++conn)
 		{
 			struct pollfd poller;
 			poller.fd = conn->first;
 			poller.events = conn->second->getSubscribedEvents();//subscribed events
-			subscribedFds.emplace_back(poller);
+			subscribedFds.push_back(poller);
 		}
 		
 		pthread_mutex_unlock(&connectionLock);
@@ -110,7 +111,7 @@ int FdPoller::pollFds()
 				continue;
 			}
 
-			auto it = connections.find(subscribedFds[i].fd);
+			std::map<int, AbstractConnection*>::iterator it = connections.find(subscribedFds[i].fd);
 			if (it != connections.end())
 			{
 				it->second->eventTriggeredCallback(subscribedFds[i].revents);

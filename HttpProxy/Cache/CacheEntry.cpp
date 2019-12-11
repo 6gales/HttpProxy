@@ -52,9 +52,9 @@ ssize_t CacheEntry::readFromRecord(ManagingConnection* reader, size_t offset)
 
 void CacheEntry::wakeUpConnections()
 {
-	for (auto it = readers.begin(); it != readers.end(); ++it)
+	for (size_t i = 0; i < readers.size(); i++)
 	{
-		(*it)->restoreToPoll();
+		readers[i]->restoreToPoll();
 	}
 	readers.clear();
 }

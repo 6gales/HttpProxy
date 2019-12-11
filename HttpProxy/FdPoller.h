@@ -1,7 +1,8 @@
 #pragma once
+#include <pthread.h>
 #include <vector>
 #include <poll.h>
-#include <unordered_map>
+#include <map>
 #include "Connections/AbstractConnection.h"
 #include "Connections/ConnectionManager.h"
 
@@ -10,20 +11,21 @@ class FdPoller : public ConnectionManager
 	pthread_mutex_t connectionLock;
 	pthread_mutexattr_t recursiveAttr;
 
-	std::unordered_map<int, AbstractConnection*> connections;
+	std::map<int, AbstractConnection*> connections;
 	std::vector<struct pollfd> subscribedFds;
 
 	std::vector<AbstractConnection*> insertList;
 	std::vector<int> deleteList;
 
 	bool isChanged;
-	bool inForEach = false;
+	bool inForEach;
 
 	void emptyLists();
 
 public:
 	FdPoller()
 	{
+		inForEach = false;
 		pthread_mutexattr_init(&recursiveAttr);
 		pthread_mutexattr_settype(&recursiveAttr, PTHREAD_MUTEX_RECURSIVE);
 
@@ -34,11 +36,11 @@ public:
 
 	pthread_mutex_t* getLock() { return &connectionLock; }
 
-	void addConnection(AbstractConnection* connection) override;
+	void addConnection(AbstractConnection* connection);
 
-	void removeConnection(int sockFd) override;
+	void removeConnection(int sockFd);
 
-	bool isConnectionFinished(int sockFd) override;
+	bool isConnectionFinished(int sockFd);
 
 	int pollFds();
 
@@ -47,14 +49,14 @@ public:
 		pthread_mutexattr_destroy(&recursiveAttr);
 		pthread_mutex_destroy(&connectionLock);
 
-		for (auto it = connections.begin(); it != connections.end(); ++it)
+		for (std::map<int, AbstractConnection*>::iterator it = connections.begin(); it != connections.end(); ++it)
 		{
 			delete it->second;
 		}
 		connections.clear();
 	}
 
-	void subscriptionChanged() override
+	void subscriptionChanged()
 	{
 		isChanged = true;
 	}

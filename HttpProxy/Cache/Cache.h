@@ -1,13 +1,15 @@
 #pragma once
-#include <unordered_map>
+#include <map>
 #include <vector>
+#include <string>
 #include <pthread.h>
+#include <stdexcept>
 #include "CacheEntry.h"
 
 class Cache
 {
 	pthread_mutex_t cacheLock;
-	std::unordered_map<std::string, CacheEntry> cache;
+	std::map<std::string, CacheEntry> cache;
 
 public:
 	Cache()
@@ -19,7 +21,7 @@ public:
 	{
 		pthread_mutex_lock(&cacheLock);
 		
-		auto it = cache.insert(std::make_pair(key, CacheEntry()));
+		std::pair<std::map<std::string, CacheEntry>::iterator, bool> it = cache.insert(std::make_pair(key, CacheEntry()));
 		
 		pthread_mutex_unlock(&cacheLock);
 
@@ -30,7 +32,7 @@ public:
 	{
 		pthread_mutex_lock(&cacheLock);
 
-		auto it = cache.find(key);
+		std::map<std::string, CacheEntry>::iterator it = cache.find(key);
 		if (it == cache.end())
 		{
 			pthread_mutex_unlock(&cacheLock);

@@ -2,22 +2,21 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include "ManagingConnection.h"
-#include "../Cache/CacheEntry.h"
+
+#define BUFF_SIZE 4096
 
 class DirectConnection;
 
 class ConnectionBuffer
 {
-	constexpr static size_t BUFF_SIZE = 4096;
-
-	bool isFull = false;
+	bool isFull;
 	char buffer[BUFF_SIZE];
 
 	ManagingConnection* waitingReader;
 	DirectConnection* waitingWriter;
 
 	size_t writeOffset[2],
-		readOffset = 0;
+		readOffset;
 
 	void wakeUpConnections();
 	void waitData(ManagingConnection* reader);
@@ -25,8 +24,10 @@ class ConnectionBuffer
 public:
 	ConnectionBuffer()
 	{
+		isFull = false;
 		writeOffset[0] = 0;
 		writeOffset[1] = 0;
+		readOffset = 0;
 	}
 
 	bool isCompleted();
@@ -50,11 +51,11 @@ public:
 		subscribedEvents = POLLIN | POLLOUT;
 	}
 
-	void eventTriggeredCallback(short events) override;
+	void eventTriggeredCallback(short events);
 
-	void suspendFromPoll() override;
+	void suspendFromPoll();
 	
-	void restoreToPoll() override;
+	void restoreToPoll();
 
 	void disableRead();
 

@@ -1,5 +1,8 @@
 #include "CachedConnection.h"
 #include <string.h>
+#include <string>
+#include <stdexcept>
+#include <errno.h>
 
 void CachedConnection::eventTriggeredCallback(short events)
 {

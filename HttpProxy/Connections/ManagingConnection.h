@@ -10,7 +10,7 @@ public:
 	ManagingConnection(int _sockFd, ConnectionManager& _manager)
 		: AbstractConnection(_sockFd), manager(_manager) {}
 
-	virtual void eventTriggeredCallback(short events) override = 0;
+	virtual void eventTriggeredCallback(short events) = 0;
 
 	virtual void suspendFromPoll() = 0;
 

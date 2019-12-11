@@ -1,6 +1,7 @@
 #pragma once
 #include <map>
 #include <vector>
+#include <string>
 #include <unistd.h>
 #include "../Cache/CacheEntry.h"
 #include "AbstractConnection.h"
@@ -10,18 +11,20 @@ class CachingConnection : public AbstractConnection
 	const std::string request;
 	CacheEntry& cacheEntry;
 	
-	size_t writeOffset = 0;
+	size_t writeOffset;
 
-	bool eof = false;
+	bool eof;
 
 public:
 	CachingConnection(int _sockFd, std::string _request, CacheEntry& _cacheEntry)
 		: AbstractConnection(_sockFd), request(_request), cacheEntry(_cacheEntry)
 	{
+		writeOffset = 0;
+		eof = false;
 		subscribedEvents = POLLIN | POLLOUT;
 	}
 
-	void eventTriggeredCallback(short events) override;
+	void eventTriggeredCallback(short events);
 
 	~CachingConnection()
 	{

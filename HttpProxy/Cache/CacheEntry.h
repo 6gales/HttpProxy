@@ -8,7 +8,7 @@ class CacheEntry
 {
 	pthread_rwlock_t rwlock;
 
-	bool isFull = false;
+	bool isFull;
 	std::vector<char> record;
 
 	std::vector<ManagingConnection*> readers;
@@ -18,6 +18,7 @@ class CacheEntry
 public:
 	CacheEntry()
 	{
+		isFull = false;
 		pthread_rwlock_init(&rwlock, NULL);
 	}
 

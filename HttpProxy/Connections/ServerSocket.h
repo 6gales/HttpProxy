@@ -12,7 +12,7 @@ class ServerSocket : public AbstractConnection
 public:
 	ServerSocket(int port, AbstractLoadBalancer* loadBalancer);
 
-	void eventTriggeredCallback(short events) override;
+	void eventTriggeredCallback(short events);
 
 	~ServerSocket()
 	{

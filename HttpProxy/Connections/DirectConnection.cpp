@@ -2,6 +2,7 @@
 #include <cstring>
 #include <netdb.h>
 #include <stdexcept>
+#include <errno.h>
 
 void DirectConnection::eventTriggeredCallback(short events)
 {
@@ -119,10 +120,10 @@ ssize_t ConnectionBuffer::readFromRecord(ManagingConnection* reader)
 		readOffset = 0;
 	}
 
-	if (waitingWriter != nullptr)
+	if (waitingWriter != NULL)
 	{
 		waitingWriter->enableRead();
-		waitingWriter = nullptr;
+		waitingWriter = NULL;
 	}
 
 	return bytesWrote;
@@ -130,10 +131,10 @@ ssize_t ConnectionBuffer::readFromRecord(ManagingConnection* reader)
 
 void ConnectionBuffer::wakeUpConnections()
 {
-	if (waitingReader != nullptr)
+	if (waitingReader != NULL)
 	{
 		waitingReader->restoreToPoll();
-		waitingReader = nullptr;
+		waitingReader = NULL;
 	}
 }
 

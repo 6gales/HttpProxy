@@ -1,6 +1,8 @@
 #pragma once
 #include <unistd.h>
 #include <string.h>
+#include <stdio.h>
+#include <errno.h>
 #include "AbstractConnection.h"
 
 class ErrorConnection : public AbstractConnection
@@ -17,7 +19,7 @@ public:
 		fprintf(stderr, "%ul\n", errorMessage.size());
 	}
 
-	void eventTriggeredCallback(short events) override
+	void eventTriggeredCallback(short events)
 	{
 		if (canWrite(events))
 		{
