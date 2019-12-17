@@ -8,7 +8,7 @@
 #include <poll.h>
 #include "../Utils/InetUtils.h"
 
-ServerSocket::ServerSocket(int port, AbstractLoadBalancer* _loadBalancer)
+ServerSocket::ServerSocket(short port, AbstractLoadBalancer *_loadBalancer)
 	: AbstractConnection(socket(AF_INET, SOCK_STREAM, 0)), loadBalancer(_loadBalancer)
 {
 	if (sockFd == -1)
@@ -60,7 +60,7 @@ int ServerSocket::acceptConnection() const
 
 void ServerSocket::eventTriggeredCallback(short events)
 {
-	if (events & POLLIN)
+	if (canRead(events))
 	{
 		loadBalancer->addClient(acceptConnection());
 	}

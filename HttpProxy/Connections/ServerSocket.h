@@ -5,12 +5,12 @@
 
 class ServerSocket : public AbstractConnection
 {
-	AbstractLoadBalancer* loadBalancer;
+	AbstractLoadBalancer *loadBalancer;
 
 	int acceptConnection() const;
 
 public:
-	ServerSocket(int port, AbstractLoadBalancer* loadBalancer);
+	ServerSocket(short port, AbstractLoadBalancer *loadBalancer);
 
 	void eventTriggeredCallback(short events) override;
 

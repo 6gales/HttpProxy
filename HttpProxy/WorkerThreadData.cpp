@@ -5,7 +5,7 @@ size_t WorkerThreadData::getLodaing()
 	return poller.connectionsSize();
 }
 
-void WorkerThreadData::enqueue(AbstractConnection* connection)
+void WorkerThreadData::enqueue(AbstractConnection *connection)
 {
 	pthread_mutex_t* lock = poller.getLock();
 	pthread_mutex_lock(lock);

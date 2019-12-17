@@ -32,9 +32,9 @@ public:
 
 	size_t connectionsSize();
 
-	pthread_mutex_t* getLock() { return &connectionLock; }
+	pthread_mutex_t *getLock() { return &connectionLock; }
 
-	void addConnection(AbstractConnection* connection) override;
+	void addConnection(AbstractConnection *connection) override;
 
 	void removeConnection(int sockFd) override;
 

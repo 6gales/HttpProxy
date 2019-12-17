@@ -1,6 +1,7 @@
 #include "FdPoller.h"
+#include <iostream>
 
-void FdPoller::addConnection(AbstractConnection* connection)
+void FdPoller::addConnection(AbstractConnection *connection)
 {
 	pthread_mutex_lock(&connectionLock);
 	isChanged = true;
@@ -124,9 +125,9 @@ int FdPoller::pollFds()
 						connections.erase(it);
 					}
 				}
-				catch (std::exception e)
+				catch (std::exception &e)
 				{
-					fprintf(stderr, "Error occured: %s\n", e.what());
+					std::cerr << "Error occured: " << e.what() << std::endl;
 					delete it->second;
 					connections.erase(it);
 				}

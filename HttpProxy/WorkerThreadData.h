@@ -8,19 +8,19 @@
 class WorkerThreadData
 {
 	FdPoller poller;
-	Cache& cache;
+	Cache &cache;
 
 	pthread_cond_t hasWork;
-	
+
 public:
-	WorkerThreadData(Cache& _cache) : cache(_cache)
+	WorkerThreadData(Cache &_cache) : cache(_cache)
 	{
 		pthread_cond_init(&hasWork, NULL);
 	}
 
 	size_t getLodaing();
 
-	void enqueue(AbstractConnection* connection);
+	void enqueue(AbstractConnection *connection);
 
 	void enqueue(int fd);
 

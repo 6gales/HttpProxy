@@ -2,7 +2,7 @@
 #include <stdexcept>
 #include <string.h>
 
-struct sockaddr_in getAddr(std::string host, int port)
+struct sockaddr_in getAddr(std::string host, short port)
 {
 	struct sockaddr_in sockAddr;
 	struct addrinfo *addr = NULL;
@@ -36,7 +36,7 @@ struct sockaddr_in getAddr(std::string host, int port)
 	return sockAddr;
 }
 
-int openRedirectedSocket(std::string addr, int port)
+int openRedirectedSocket(std::string addr, short port)
 {
 	struct sockaddr_in redirectAddr = getAddr(addr, port);
 	int sock = socket(AF_INET, SOCK_STREAM, 0);
@@ -47,9 +47,9 @@ int openRedirectedSocket(std::string addr, int port)
 	return sock;
 }
 
-std::pair<std::string, int> parseHost(std::string host)
+std::pair<std::string, short> parseHost(std::string host)
 {
-	int port = 0;
+	short port = 0;
 	size_t pos = host.find(':', 0);
 	std::string url = host.substr(0, pos);
 

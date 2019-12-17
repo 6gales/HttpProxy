@@ -5,16 +5,38 @@
 class ManagingConnection : public AbstractConnection
 {
 protected:
-	ConnectionManager& manager;
+	ConnectionManager &manager;
 public:
-	ManagingConnection(int _sockFd, ConnectionManager& _manager)
+	ManagingConnection(int _sockFd, ConnectionManager &_manager)
 		: AbstractConnection(_sockFd), manager(_manager) {}
 
 	virtual void eventTriggeredCallback(short events) override = 0;
 
-	virtual void suspendFromPoll() = 0;
+	void disableWrite()
+	{
+		//turn off writing ability
+		subscribedEvents &= ~POLLOUT;
+		manager.subscriptionChanged();
+	}
 
-	virtual void restoreToPoll() = 0;
+	void enableWrite()
+	{
+		//restore writing ability
+		subscribedEvents |= POLLOUT;
+		manager.subscriptionChanged();
+	}
+
+	void disableRead()
+	{
+		subscribedEvents &= ~POLLIN;
+		manager.subscriptionChanged();
+	}
+
+	void enableRead()
+	{
+		subscribedEvents |= POLLIN;
+		manager.subscriptionChanged();
+	}
 
 	virtual ~ManagingConnection() {}
 };

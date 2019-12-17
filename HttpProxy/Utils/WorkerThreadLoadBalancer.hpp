@@ -6,10 +6,10 @@
 
 class WorkerThreadLoadBalancer : public AbstractLoadBalancer
 {
-	const std::vector<WorkerThreadData*>& datas;
+	const std::vector<WorkerThreadData*> &datas;
 
 public:
-	WorkerThreadLoadBalancer(const std::vector<WorkerThreadData*>& _datas)
+	WorkerThreadLoadBalancer(const std::vector<WorkerThreadData*> &_datas)
 		: datas(_datas) {}
 
 	void addClient(int sockFd) override
@@ -17,7 +17,7 @@ public:
 		fprintf(stderr, "New client connected\n");
 
 		auto it = std::min_element(datas.begin(), datas.end(),
-			[](WorkerThreadData* a, WorkerThreadData* b)
+			[](WorkerThreadData *a, WorkerThreadData *b)
 			{
 				return a->getLodaing() < b->getLodaing();
 			});

@@ -14,6 +14,7 @@ class CacheEntry
 	std::vector<ManagingConnection*> readers;
 
 	void wakeUpConnections();
+	void waitData(ManagingConnection *reader);
 
 public:
 	CacheEntry()
@@ -25,11 +26,9 @@ public:
 
 	size_t recordSize();
 
-	void waitData(ManagingConnection* reader);
-
 	ssize_t writeToRecord(int sockFd);
 
-	ssize_t readFromRecord(ManagingConnection* reader, size_t offset);
+	ssize_t readFromRecord(ManagingConnection *reader, size_t offset);
 
 	~CacheEntry()
 	{

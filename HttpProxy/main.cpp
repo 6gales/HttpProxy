@@ -9,8 +9,8 @@ int main(int argc, char **argv)
 		return 0;
 	}
 
-	int threads = (argc > 1 ? std::atoi(argv[1]) : 1),
-		lport = (argc > 2 ? std::atoi(argv[2]) : 8888);
+	int threads = (argc > 1 ? std::atoi(argv[1]) : 1);
+	short lport = static_cast<short>(argc > 2 ? std::atoi(argv[2]) : 8080);
 	
 	if (lport <= 0 || threads <= 0)
 	{

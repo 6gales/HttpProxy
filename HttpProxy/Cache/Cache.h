@@ -18,15 +18,15 @@ public:
 	bool createIfNotExists(std::string key)
 	{
 		pthread_mutex_lock(&cacheLock);
-		
+
 		auto it = cache.insert(std::make_pair(key, CacheEntry()));
-		
+
 		pthread_mutex_unlock(&cacheLock);
 
 		return it.second;
 	}
 
-	CacheEntry& getEntry(std::string key)
+	CacheEntry &getEntry(std::string key)
 	{
 		pthread_mutex_lock(&cacheLock);
 

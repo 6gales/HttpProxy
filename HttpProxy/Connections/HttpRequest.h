@@ -11,19 +11,20 @@ class HttpRequest : public ManagingConnection
 	constexpr static size_t BUFF_SIZE = 1024;
 	unsigned char buffer[BUFF_SIZE];
 
-	Cache& cache;
+	Cache &cache;
 	bool readRequest = false,
 		eof = false;
-	
+
 	std::string request;
 
 	void parseRequest();
 
 public:
-	HttpRequest(int _clientFd, ConnectionManager& _manager, Cache& _cache)
+	HttpRequest(int _clientFd, ConnectionManager &_manager, Cache &_cache)
 		: ManagingConnection(_clientFd, _manager), cache(_cache)
 	{
 		subscribedEvents = POLLIN;
+		fprintf(stderr, "hr:%d\n", subscribedEvents);
 	}
 
 	void eventTriggeredCallback(short events) override;
@@ -36,8 +37,4 @@ public:
 			close(sockFd);
 		}
 	}
-
-	// Inherited via ManagingConnection
-	virtual void suspendFromPoll() override;
-	virtual void restoreToPoll() override;
 };

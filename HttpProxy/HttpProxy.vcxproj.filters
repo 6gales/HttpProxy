@@ -32,6 +32,9 @@
     <ClCompile Include="Connections\DirectConnection.cpp">
       <Filter>Connections</Filter>
     </ClCompile>
+    <ClCompile Include="Utils\ConnectionBuffer.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="HttpProxy.h" />
@@ -81,6 +84,9 @@
     <ClInclude Include="FdPoller.h" />
     <ClInclude Include="Connections\DirectConnection.h">
       <Filter>Connections</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\ConnectionBuffer.h">
+      <Filter>Utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

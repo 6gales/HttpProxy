@@ -12,26 +12,36 @@ class HttpProxy
 	Cache cache;
 
 	const size_t threadNum;
-	pthread_t* threads = nullptr;
-	std::vector<WorkerThreadData*> datas;
+	pthread_t *threads = nullptr;
+	std::vector<WorkerThreadData *> datas;
 
 	void work(size_t id);
+
+public:
+	enum Status
+	{
+		Running,
+		GracefulShutdown,
+		ForcedShutdown
+	};
+
+private:
+	static Status proxyStatus;
+
+	static void gracefulShutdownHandler(int signal);
+
+	static void forcedShutdownHandler(int signal);
 
 	struct ThreadInfo
 	{
 		size_t id;
-		HttpProxy* proxy;
+		HttpProxy *proxy;
 	};
 
-	static void* startThread(void* threadInfo)
-	{
-		ThreadInfo* info = reinterpret_cast<ThreadInfo*>(threadInfo);
-		info->proxy->work(info->id);
-		return NULL;
-	}
+	static void *startThread(void *threadInfo);
 
 public:
-	HttpProxy(int lport, size_t _threads) : threadNum(_threads), datas(_threads)
+	HttpProxy(short lport, size_t _threads) : threadNum(_threads), datas(_threads)
 	{
 		for (size_t i = 0; i < threadNum; i++)
 		{
@@ -51,8 +61,8 @@ public:
 		{
 			for (size_t i = 0; i < threadNum; i++)
 			{
-//				pthread_cancel
-//				pthread_join
+				//				pthread_cancel
+				//				pthread_join
 			}
 			delete[] threads;
 		}
