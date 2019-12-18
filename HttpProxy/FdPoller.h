@@ -34,15 +34,22 @@ public:
 
 	size_t connectionsSize();
 
-	pthread_mutex_t* getLock() { return &connectionLock; }
+	pthread_mutex_t *getLock() { return &connectionLock; }
 
-	void addConnection(AbstractConnection* connection);
+	void gracefulShutdown();
+
+	void addConnection(AbstractConnection *connection) override;
 
 	void removeConnection(int sockFd);
 
 	bool isConnectionFinished(int sockFd);
 
 	int pollFds();
+
+	void subscriptionChanged() override
+	{
+		isChanged = true;
+	}
 
 	~FdPoller()
 	{
@@ -51,13 +58,15 @@ public:
 
 		for (std::map<int, AbstractConnection*>::iterator it = connections.begin(); it != connections.end(); ++it)
 		{
+			it->second->forceClose();
 			delete it->second;
 		}
 		connections.clear();
-	}
 
-	void subscriptionChanged()
-	{
-		isChanged = true;
+		for (size_t i = 0; i < insertList.size(); i++)
+		{
+			insertList[i]->forceClose();
+			delete insertList[i];
+		}
 	}
 };

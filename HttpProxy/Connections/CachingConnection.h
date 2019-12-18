@@ -9,14 +9,14 @@
 class CachingConnection : public AbstractConnection
 {
 	const std::string request;
-	CacheEntry& cacheEntry;
-	
-	size_t writeOffset;
+	CacheEntry &cacheEntry;
+
+	size_t writeOffset = 0;
 
 	bool eof;
 
 public:
-	CachingConnection(int _sockFd, std::string _request, CacheEntry& _cacheEntry)
+	CachingConnection(int _sockFd, std::string _request, CacheEntry &_cacheEntry)
 		: AbstractConnection(_sockFd), request(_request), cacheEntry(_cacheEntry)
 	{
 		writeOffset = 0;

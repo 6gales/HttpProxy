@@ -1,12 +1,14 @@
 #include "CacheEntry.h"
 #include <netdb.h>
+#include <fcntl.h>
+#include <stdio.h>
 
 ssize_t CacheEntry::writeToRecord(int sockFd)
 {
 	pthread_rwlock_wrlock(&rwlock);
 
 	char buffer[4096];
-	ssize_t bytesRead = recv(sockFd, buffer, 4096, 0);
+	ssize_t bytesRead = recv(sockFd, buffer, 4096, MSG_NOSIGNAL);
 
 	if (bytesRead > 0)
 	{
@@ -29,7 +31,7 @@ ssize_t CacheEntry::writeToRecord(int sockFd)
 	return bytesRead;
 }
 
-ssize_t CacheEntry::readFromRecord(ManagingConnection* reader, size_t offset)
+ssize_t CacheEntry::readFromRecord(ManagingConnection *reader, size_t offset)
 {
 	pthread_rwlock_rdlock(&rwlock);
 
@@ -43,7 +45,7 @@ ssize_t CacheEntry::readFromRecord(ManagingConnection* reader, size_t offset)
 		return 0;
 	}
 
-	ssize_t bytesWrote = send(reader->getFd(), record.data() + offset, record.size() - offset, 0);
+	ssize_t bytesWrote = send(reader->getFd(), record.data() + offset, record.size() - offset, MSG_NOSIGNAL);
 
 	pthread_rwlock_unlock(&rwlock);
 
@@ -54,14 +56,14 @@ void CacheEntry::wakeUpConnections()
 {
 	for (size_t i = 0; i < readers.size(); i++)
 	{
-		readers[i]->restoreToPoll();
+		(*it)->disableRead();
 	}
 	readers.clear();
 }
 
-void CacheEntry::waitData(ManagingConnection* reader)
+void CacheEntry::waitData(ManagingConnection *reader)
 {
-	reader->suspendFromPoll();
+	reader->enableRead();
 	readers.push_back(reader);
 }
 

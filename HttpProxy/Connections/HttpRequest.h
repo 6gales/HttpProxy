@@ -13,16 +13,16 @@ class HttpRequest : public ManagingConnection
 {
 	unsigned char buffer[BUFF_SIZE];
 
-	Cache& cache;
-	bool readRequest,
-		eof;
-	
+	Cache &cache;
+	bool readRequest = false,
+		eof = false;
+
 	std::string request;
 
 	void parseRequest();
 
 public:
-	HttpRequest(int _clientFd, ConnectionManager& _manager, Cache& _cache)
+	HttpRequest(int _clientFd, ConnectionManager &_manager, Cache &_cache)
 		: ManagingConnection(_clientFd, _manager), cache(_cache)
 	{
 		readRequest = false;
@@ -34,14 +34,10 @@ public:
 
 	~HttpRequest()
 	{
-		if (eof && !readRequest)
+		if (eof && !readRequest || closeForced)
 		{
 			fprintf(stderr, "close fd\n");
 			close(sockFd);
 		}
 	}
-
-	// Inherited via ManagingConnection
-	virtual void suspendFromPoll();
-	virtual void restoreToPoll();
 };

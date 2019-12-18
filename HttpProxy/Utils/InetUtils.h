@@ -2,8 +2,8 @@
 #include <string>
 #include "netdb.h"
 
-struct sockaddr_in getAddr(std::string host, int port);
+struct sockaddr_in getAddr(std::string host, short port);
 
-int openRedirectedSocket(std::string addr, int port);
+int openRedirectedSocket(std::string addr, short port);
 
-std::pair<std::string, int> parseHost(std::string host);
+std::pair<std::string, short> parseHost(std::string host);

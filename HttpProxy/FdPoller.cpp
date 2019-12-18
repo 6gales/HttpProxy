@@ -1,7 +1,33 @@
 #include "FdPoller.h"
-#include <stdio.h>
+#include <iostream>
 
-void FdPoller::addConnection(AbstractConnection* connection)
+void FdPoller::gracefulShutdown()
+{
+	pthread_mutex_lock(&connectionLock);
+
+	for (auto conn = connections.begin(); conn != connections.end(); ++conn)
+	{
+		fprintf(stderr, "Gracefuly finishing %x...\n", conn->second);
+		conn->second->gracefulShutdown();
+		if (conn->second->isFinished())
+		{
+			deleteList.push_back(conn->first);
+			fprintf(stderr, "Gracefuly finished %x\n", conn->second);
+			delete conn->second;
+		}
+	}
+
+	for (size_t i = 0; i < deleteList.size(); i++)
+	{
+		connections.erase(deleteList[i]);
+	}
+	deleteList.clear();
+
+	isChanged = true;
+	pthread_mutex_unlock(&connectionLock);
+}
+
+void FdPoller::addConnection(AbstractConnection *connection)
 {
 	pthread_mutex_lock(&connectionLock);
 	isChanged = true;
@@ -84,8 +110,8 @@ int FdPoller::pollFds()
 		{
 			struct pollfd poller;
 			poller.fd = conn->first;
-			poller.events = conn->second->getSubscribedEvents();//subscribed events
-			subscribedFds.push_back(poller);
+			poller.events = conn->second->getSubscribedEvents() | POLLERR | POLLHUP | POLLNVAL;
+			subscribedFds.emplace_back(poller);
 		}
 		
 		pthread_mutex_unlock(&connectionLock);
@@ -114,10 +140,19 @@ int FdPoller::pollFds()
 			std::map<int, AbstractConnection*>::iterator it = connections.find(subscribedFds[i].fd);
 			if (it != connections.end())
 			{
-				it->second->eventTriggeredCallback(subscribedFds[i].revents);
-				if (it->second->isFinished())
+				try
 				{
-					fprintf(stderr, "Deleting in poll %x\n", it->second);
+					it->second->eventTriggeredCallback(subscribedFds[i].revents);
+					if (it->second->isFinished())
+					{
+						fprintf(stderr, "Deleting in poll %x\n", it->second);
+						delete it->second;
+						connections.erase(it);
+					}
+				}
+				catch (std::exception &e)
+				{
+					std::cerr << "Error occured: " << e.what() << std::endl;
 					delete it->second;
 					connections.erase(it);
 				}

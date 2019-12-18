@@ -5,8 +5,9 @@ class AbstractConnection
 {
 protected:
 	const int sockFd;
-	bool finished;
-	short subscribedEvents;
+	bool closeForced = false;
+	bool finished = false;
+	short subscribedEvents = 0;
 
 	bool canRead(short events)
 	{
@@ -16,6 +17,21 @@ protected:
 	bool canWrite(short events)
 	{
 		return events & POLLOUT;
+	}
+
+	bool isHangedUp(short events)
+	{
+		return events & POLLHUP;
+	}
+
+	bool isErrorOccuerd(short events)
+	{
+		return events & POLLERR;
+	}
+
+	bool isInvalid(short events)
+	{
+		return events & POLLNVAL;
 	}
 
 public:
@@ -30,6 +46,10 @@ public:
 	int getFd() const { return sockFd; }
 
 	bool isFinished() const { return finished; }
+
+	void forceClose() { closeForced = true; }
+
+	virtual void gracefulShutdown() {}
 
 	virtual void eventTriggeredCallback(short events) = 0;
 

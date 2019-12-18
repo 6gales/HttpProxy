@@ -7,22 +7,18 @@
 
 class WorkerThreadLoadBalancer : public AbstractLoadBalancer
 {
-	const std::vector<WorkerThreadData*>& datas;
+	const std::vector<WorkerThreadData*> &datas;
 
 public:
-	WorkerThreadLoadBalancer(const std::vector<WorkerThreadData*>& _datas)
+	WorkerThreadLoadBalancer(const std::vector<WorkerThreadData*> &_datas)
 		: datas(_datas) {}
 
 	void addClient(int sockFd)
 	{
 		fprintf(stderr, "New client connected\n");
 
-		size_t min = 0,
-			minLoading = datas[0]->getLodaing();
-
-		for (size_t i = 1; i < datas.size(); i++)
-		{
-			if (datas[i]->getLodaing() < minLoading)
+		auto it = std::min_element(datas.begin(), datas.end(),
+			[](WorkerThreadData *a, WorkerThreadData *b)
 			{
 				min = i;
 				minLoading = datas[i]->getLodaing();

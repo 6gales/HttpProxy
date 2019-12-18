@@ -6,12 +6,12 @@
 
 class CachedConnection : public ManagingConnection
 {
-	CacheEntry& cacheEntry;
+	CacheEntry &cacheEntry;
 
 	size_t writeOffset;
 
 public:
-	CachedConnection(int _sockFd, ConnectionManager& manager, CacheEntry& _cacheEntry)
+	CachedConnection(int _sockFd, ConnectionManager &manager, CacheEntry &_cacheEntry)
 		: ManagingConnection(_sockFd, manager), cacheEntry(_cacheEntry)
 	{
 		writeOffset = 0;
@@ -19,16 +19,6 @@ public:
 	}
 
 	void eventTriggeredCallback(short events);
-
-	void suspendFromPoll()
-	{
-		manager.removeConnection(sockFd);
-	}
-
-	void restoreToPoll()
-	{
-		manager.addConnection(this);
-	}
 
 	~CachedConnection()
 	{

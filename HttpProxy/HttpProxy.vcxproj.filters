@@ -32,6 +32,11 @@
     <ClCompile Include="Connections\DirectConnection.cpp">
       <Filter>Connections</Filter>
     </ClCompile>
+    <ClCompile Include="Utils\ConnectionBuffer.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="ConsistentVector.cpp" />
+    <ClCompile Include="SharedPtr.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="HttpProxy.h" />
@@ -82,6 +87,11 @@
     <ClInclude Include="Connections\DirectConnection.h">
       <Filter>Connections</Filter>
     </ClInclude>
+    <ClInclude Include="Utils\ConnectionBuffer.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="ConsistentVector.h" />
+    <ClInclude Include="SharedPtr.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="ThirdParty">

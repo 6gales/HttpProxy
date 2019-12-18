@@ -11,7 +11,7 @@ void HttpRequest::eventTriggeredCallback(short events)
 {
 	if (canRead(events) && !eof)
 	{
-		ssize_t bytesRead = recv(sockFd, buffer, BUFF_SIZE, 0);
+		ssize_t bytesRead = recv(sockFd, buffer, BUFF_SIZE, MSG_NOSIGNAL);
 		if (bytesRead < 0)
 		{
 			throw std::runtime_error(std::string("recv: ") + strerror(errno));
@@ -58,18 +58,10 @@ void HttpRequest::eventTriggeredCallback(short events)
 	}
 }
 
-void HttpRequest::suspendFromPoll()
-{
-}
-
-void HttpRequest::restoreToPoll()
-{
-}
-
 void HttpRequest::parseRequest()
 {
-	const char* path;
-	const char* method;
+	const char *path;
+	const char *method;
 	int minorVersion;
 	size_t headerNum = 100;
 	struct phr_header headers[headerNum];
@@ -81,18 +73,36 @@ void HttpRequest::parseRequest()
 		&path, &pathLen,
 		&minorVersion, headers, &headerNum, request.size());
 
-	//coonection header
-	std::pair<std::string, int> urlPort;
+	std::pair<std::string, short> urlPort;
 	urlPort.second = -1;
+	
+	bool connectionInserted = false;
+	std::string strMethod = std::string(method, methodLen);
+	std::string http0Request = strMethod + " " + std::string(path, pathLen) + " HTTP/1.0\r\n";
 	for (size_t i = 0; i < headerNum; i++)
 	{
-		if (!strncmp(headers[i].name, "Host",
-			headers[i].name_len < 4 ? headers[i].name_len : 4))
+		std::string header(headers[i].name, headers[i].name_len);
+		std::string value(headers[i].value, headers[i].value_len);
+
+		if (header == "Host")
 		{
-			urlPort = parseHost(std::string(headers[i].value, headers[i].value_len));
-			break;
+			urlPort = parseHost(value);
 		}
+		else if (header == "Connection" || header == "Proxy-Connection")
+		{
+			if (connectionInserted)
+			{
+				continue;
+			}
+
+			header = "Connection";
+			value = "close";
+		}
+
+		http0Request += header + ": " + value + "\r\n";
 	}
+	http0Request += "\r\n";
+
 	//if no HOST param
 	if (urlPort.second < 0)
 	{
@@ -102,38 +112,25 @@ void HttpRequest::parseRequest()
 
 	int servFd = openRedirectedSocket(urlPort.first, urlPort.second);
 
-	if (minorVersion != 0 || !strncmp(method, "GET", 3))
+	if (strMethod != "GET")
 	{
-		ConnectionBuffer* clientToServ = new ConnectionBuffer(),
-			* servToClient = new ConnectionBuffer();
+		auto clientToServ = std::make_shared<ConnectionBuffer>(http0Request),
+			servToClient = std::make_shared<ConnectionBuffer>();
 		manager.addConnection(new DirectConnection(sockFd, clientToServ, servToClient, manager));
 		manager.addConnection(new DirectConnection(servFd, servToClient, clientToServ, manager));
-		//manager.addConnection(new ErrorConnection(sockFd, "HTTP/1.0 505 HTTP Version Not Supported\r\n\r\n"));
 		return;
 	}
 
-	//	if (!strncmp(method, "GET", 3))
-	//	{
-	bool isInserted = cache.createIfNotExists(request);
-	CacheEntry& entry = cache.getEntry(request);
+	bool isInserted = cache.createIfNotExists(http0Request);
+	CacheEntry &entry = cache.getEntry(http0Request);
 
 	if (isInserted)
 	{
+		manager.addConnection(new CachingConnection(servFd, http0Request, entry));
+		manager.addConnection(new CachedConnection(sockFd, manager, entry));
+		return;
+	}
 
-		manager.addConnection(new CachingConnection(servFd, request, entry));
-		manager.addConnection(new CachedConnection(sockFd, manager, entry));
-		return;
-	}
-	else
-	{
-		manager.addConnection(new CachedConnection(sockFd, manager, entry));
-		return;
-	}
-	//}
-	//else
-	//{
-	//	fprintf(stderr, "Error connection 501\n");
-	//	manager.addConnection(new ErrorConnection(sockFd, "HTTP/1.0 501 Not Implemented\r\n\r\n"));
-	//	return;
-	//}
+	manager.addConnection(new CachedConnection(sockFd, manager, entry));
+	return;
 }

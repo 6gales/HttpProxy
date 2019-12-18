@@ -16,14 +16,13 @@ public:
 	{
 		subscribedEvents = POLLOUT;
 		writeOffset = 0;
-		fprintf(stderr, "%ul\n", errorMessage.size());
 	}
 
 	void eventTriggeredCallback(short events)
 	{
 		if (canWrite(events))
 		{
-			ssize_t bytesWrote = send(sockFd, errorMessage.c_str() + writeOffset, errorMessage.size() - writeOffset, 0);
+			ssize_t bytesWrote = send(sockFd, errorMessage.c_str() + writeOffset, errorMessage.size() - writeOffset, MSG_NOSIGNAL);
 			if (bytesWrote < 0 && errno != EWOULDBLOCK)
 			{
 				throw std::runtime_error(std::string("send: ") + strerror(errno));
