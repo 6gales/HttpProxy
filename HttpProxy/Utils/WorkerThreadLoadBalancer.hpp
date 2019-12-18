@@ -17,11 +17,15 @@ public:
 	{
 		fprintf(stderr, "New client connected\n");
 
-		auto it = std::min_element(datas.begin(), datas.end(),
-			[](WorkerThreadData *a, WorkerThreadData *b)
+		size_t min = 0,
+			minLoading = datas[0]->getLoading();
+		for (size_t i = 0; i < datas.size(); i++)
+		{
+			size_t loading = datas[i]->getLoading();
+			if (loading < minLoading)
 			{
 				min = i;
-				minLoading = datas[i]->getLodaing();
+				minLoading = loading;
 			}
 		}
 

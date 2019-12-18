@@ -1,5 +1,6 @@
 #include "DirectConnection.h"
 #include <cstring>
+#include <stdio.h>
 #include <netdb.h>
 #include <stdexcept>
 #include <errno.h>

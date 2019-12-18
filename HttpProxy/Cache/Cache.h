@@ -21,7 +21,7 @@ public:
 	{
 		pthread_mutex_lock(&cacheLock);
 
-		auto it = cache.insert(std::make_pair(key, CacheEntry()));
+		std::pair<std::map<std::string, CacheEntry>::iterator, bool> it = cache.insert(std::make_pair(key, CacheEntry()));
 
 		pthread_mutex_unlock(&cacheLock);
 

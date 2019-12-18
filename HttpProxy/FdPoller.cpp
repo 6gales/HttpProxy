@@ -1,11 +1,12 @@
 #include "FdPoller.h"
+#include <stdio.h>
 #include <iostream>
 
 void FdPoller::gracefulShutdown()
 {
 	pthread_mutex_lock(&connectionLock);
 
-	for (auto conn = connections.begin(); conn != connections.end(); ++conn)
+	for (std::map<int, AbstractConnection *>::iterator conn = connections.begin(); conn != connections.end(); ++conn)
 	{
 		fprintf(stderr, "Gracefuly finishing %x...\n", conn->second);
 		conn->second->gracefulShutdown();
@@ -102,16 +103,15 @@ int FdPoller::pollFds()
 {
 	if (isChanged)
 	{
+		pthread_mutex_lock(&connectionLock);
 		subscribedFds.clear();
 
-		pthread_mutex_lock(&connectionLock);
-		
 		for (std::map<int, AbstractConnection*>::iterator conn = connections.begin(); conn != connections.end(); ++conn)
 		{
 			struct pollfd poller;
 			poller.fd = conn->first;
 			poller.events = conn->second->getSubscribedEvents() | POLLERR | POLLHUP | POLLNVAL;
-			subscribedFds.emplace_back(poller);
+			subscribedFds.push_back(poller);
 		}
 		
 		pthread_mutex_unlock(&connectionLock);

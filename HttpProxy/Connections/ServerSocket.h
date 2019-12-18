@@ -14,7 +14,7 @@ public:
 
 	void eventTriggeredCallback(short events);
 
-	void gracefulShutdown() override
+	void gracefulShutdown()
 	{
 		finished = true;
 	}

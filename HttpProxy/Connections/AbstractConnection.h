@@ -5,9 +5,9 @@ class AbstractConnection
 {
 protected:
 	const int sockFd;
-	bool closeForced = false;
-	bool finished = false;
-	short subscribedEvents = 0;
+	bool closeForced;
+	bool finished;
+	short subscribedEvents;
 
 	bool canRead(short events)
 	{
@@ -39,6 +39,7 @@ public:
 	{
 		finished = false;
 		subscribedEvents = 0;
+		closeForced = false;
 	}
 
 	short getSubscribedEvents() { return subscribedEvents; }

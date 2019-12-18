@@ -3,13 +3,14 @@
 #include <pthread.h>
 #include <sys/types.h>
 #include "../Connections/ManagingConnection.h"
+#include "../Utils/ConsistentVector.hpp"
 
 class CacheEntry
 {
 	pthread_rwlock_t rwlock;
 
 	bool isFull;
-	std::vector<char> record;
+	ConsistentVector<char> record;
 
 	std::vector<ManagingConnection*> readers;
 

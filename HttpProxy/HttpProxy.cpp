@@ -11,7 +11,7 @@ void HttpProxy::work(size_t id)
 {
 	fprintf(stderr, "Thread #%lu started\n", id);
 
-	while (proxyStatus == HttpProxy::Status::Running)
+	while (proxyStatus == Running)
 	{
 		if (datas[id]->waitWork())
 		{
@@ -22,7 +22,7 @@ void HttpProxy::work(size_t id)
 	datas[id]->shutdown();
 	fprintf(stderr, "Graceful shutdown in thread #%lu\n", id);
 
-	while (proxyStatus == HttpProxy::Status::GracefulShutdown && datas[id]->getLodaing() > 0)
+	while (proxyStatus == GracefulShutdown && datas[id]->getLoading() > 0)
 	{
 		fprintf(stderr, "Thread #%lu polled %d\n", id, datas[id]->poll());
 	}
@@ -34,7 +34,7 @@ void HttpProxy::run()
 		<< "Hit Ctrl^C for graceful shutdown" << std::endl
 		<< "Hit twice to force shutdown" << std::endl;
 
-	proxyStatus = HttpProxy::Status::Running;
+	proxyStatus = Running;
 
 	pthread_t *threads = new pthread_t[threadNum - 1];
 	ThreadInfo threadInfos[threadNum - 1];
@@ -57,7 +57,7 @@ void HttpProxy::run()
 
 	for (ssize_t i = 0; i < threadNum - 1; i++)
 	{
-		if (proxyStatus == HttpProxy::Status::ForcedShutdown)
+		if (proxyStatus == ForcedShutdown)
 		{
 			pthread_cancel(threads[i]);
 		}

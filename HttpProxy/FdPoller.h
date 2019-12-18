@@ -5,6 +5,7 @@
 #include <map>
 #include "Connections/AbstractConnection.h"
 #include "Connections/ConnectionManager.h"
+#include "Utils/ConsistentVector.hpp"
 
 class FdPoller : public ConnectionManager
 {
@@ -12,7 +13,7 @@ class FdPoller : public ConnectionManager
 	pthread_mutexattr_t recursiveAttr;
 
 	std::map<int, AbstractConnection*> connections;
-	std::vector<struct pollfd> subscribedFds;
+	ConsistentVector<struct pollfd> subscribedFds;
 
 	std::vector<AbstractConnection*> insertList;
 	std::vector<int> deleteList;
@@ -38,7 +39,7 @@ public:
 
 	void gracefulShutdown();
 
-	void addConnection(AbstractConnection *connection) override;
+	void addConnection(AbstractConnection *connection);
 
 	void removeConnection(int sockFd);
 
@@ -46,7 +47,7 @@ public:
 
 	int pollFds();
 
-	void subscriptionChanged() override
+	void subscriptionChanged()
 	{
 		isChanged = true;
 	}

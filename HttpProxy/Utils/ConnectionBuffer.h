@@ -3,19 +3,20 @@
 #include <vector>
 #include <string>
 #include "../Connections/ManagingConnection.h"
+#include <stdio.h>
+
+#define CONN_BUFF_SIZE 4096
 
 class ConnectionBuffer
 {
-	constexpr static size_t BUFF_SIZE = 4096;
-
-	bool isFull = false;
+	bool isFull;
 	std::vector<char> buffer;
 
-	ManagingConnection *waitingReader = nullptr,
-		*waitingWriter = nullptr;
+	ManagingConnection *waitingReader,
+		*waitingWriter;
 
 	size_t writeOffset[2],
-		readOffset = 0;
+		readOffset;
 
 	void wakeUpReader();
 	void suspendReader(ManagingConnection *reader);
@@ -23,16 +24,27 @@ class ConnectionBuffer
 	void suspendWriter(ManagingConnection *reader);
 
 public:
-	ConnectionBuffer() : buffer(BUFF_SIZE)
+	ConnectionBuffer() : buffer(CONN_BUFF_SIZE)
 	{
+		isFull = false;
+		waitingReader = NULL;
+		waitingWriter = NULL;
+
 		writeOffset[0] = 0;
 		writeOffset[1] = 0;
+		readOffset = 0;
 	}
 
-	ConnectionBuffer(std::string initialData) : buffer(std::max(initialData.size(), BUFF_SIZE))
+	ConnectionBuffer(std::string initialData)
+		: buffer(std::max(initialData.size(), (size_t)CONN_BUFF_SIZE))
 	{
+		isFull = false;
+		waitingReader = NULL;
+		waitingWriter = NULL;
+
 		writeOffset[0] = initialData.size();
 		writeOffset[1] = 0;
+		readOffset = 0;
 
 		for (size_t i = 0; i < initialData.size(); i++)
 		{

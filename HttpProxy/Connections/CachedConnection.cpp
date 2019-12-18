@@ -1,5 +1,6 @@
 #include "CachedConnection.h"
 #include <string.h>
+#include <stdio.h>
 #include <string>
 #include <stdexcept>
 #include <errno.h>

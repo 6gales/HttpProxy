@@ -11,7 +11,7 @@ class CachingConnection : public AbstractConnection
 	const std::string request;
 	CacheEntry &cacheEntry;
 
-	size_t writeOffset = 0;
+	size_t writeOffset;
 
 	bool eof;
 

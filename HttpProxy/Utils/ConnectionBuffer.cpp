@@ -1,6 +1,7 @@
 #include "ConnectionBuffer.h"
 #include <errno.h>
 #include <netdb.h>
+#include <stdio.h>
 
 ssize_t ConnectionBuffer::writeToRecord(ManagingConnection *writer)
 {
@@ -72,21 +73,21 @@ ssize_t ConnectionBuffer::readFromRecord(ManagingConnection *reader)
 
 void ConnectionBuffer::wakeUpReader()
 {
-	if (waitingReader != nullptr)
+	if (waitingReader != NULL)
 	{
 		fprintf(stderr, "Waking up reader %x\n", waitingReader);
 		waitingReader->enableWrite();
-		waitingReader = nullptr;
+		waitingReader = NULL;
 	}
 }
 
 void ConnectionBuffer::wakeUpWriter()
 {
-	if (waitingWriter != nullptr)
+	if (waitingWriter != NULL)
 	{
 		fprintf(stderr, "Waking up writer %x\n", waitingWriter);
 		waitingWriter->enableRead();
-		waitingWriter = nullptr;
+		waitingWriter = NULL;
 	}
 }
 

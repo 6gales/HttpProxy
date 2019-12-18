@@ -8,17 +8,18 @@ class WorkerThreadData
 {
 	FdPoller poller;
 	Cache &cache;
-	bool isShutdowned = false;
+	bool isShutdowned;
 
 	pthread_cond_t hasWork;
 
 public:
 	WorkerThreadData(Cache &_cache) : cache(_cache)
 	{
+		isShutdowned = false;
 		pthread_cond_init(&hasWork, NULL);
 	}
 
-	size_t getLodaing();
+	size_t getLoading();
 
 	void shutdown()
 	{

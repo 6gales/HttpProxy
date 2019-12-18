@@ -14,8 +14,8 @@ class HttpRequest : public ManagingConnection
 	unsigned char buffer[BUFF_SIZE];
 
 	Cache &cache;
-	bool readRequest = false,
-		eof = false;
+	bool readRequest,
+		eof;
 
 	std::string request;
 
@@ -34,7 +34,7 @@ public:
 
 	~HttpRequest()
 	{
-		if (eof && !readRequest || closeForced)
+		if ((eof && !readRequest) || closeForced)
 		{
 			fprintf(stderr, "close fd\n");
 			close(sockFd);

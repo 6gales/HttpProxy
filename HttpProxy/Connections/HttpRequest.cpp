@@ -114,8 +114,8 @@ void HttpRequest::parseRequest()
 
 	if (strMethod != "GET")
 	{
-		auto clientToServ = std::make_shared<ConnectionBuffer>(http0Request),
-			servToClient = std::make_shared<ConnectionBuffer>();
+		SharedPtr<ConnectionBuffer> clientToServ(new ConnectionBuffer(http0Request)),
+			servToClient(new ConnectionBuffer());
 		manager.addConnection(new DirectConnection(sockFd, clientToServ, servToClient, manager));
 		manager.addConnection(new DirectConnection(servFd, servToClient, clientToServ, manager));
 		return;

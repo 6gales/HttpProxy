@@ -56,7 +56,7 @@ void CacheEntry::wakeUpConnections()
 {
 	for (size_t i = 0; i < readers.size(); i++)
 	{
-		(*it)->disableRead();
+		readers[i]->disableRead();
 	}
 	readers.clear();
 }

@@ -1,7 +1,7 @@
 #include "WorkerThreadData.h"
 #include <stdio.h>
 
-size_t WorkerThreadData::getLodaing()
+size_t WorkerThreadData::getLoading()
 {
 	return poller.connectionsSize();
 }
