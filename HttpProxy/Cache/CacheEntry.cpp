@@ -44,14 +44,6 @@ ssize_t CacheEntry::readFromRecord(ManagingConnection *reader, size_t offset)
 		pthread_rwlock_unlock(&rwlock);
 		return 0;
 	}
-	
-	int r = fcntl(reader->getFd(), F_GETFD);
-	fprintf(stderr, "Fcntl = %d\n", r);
-	if (r == -1)
-	{
-		fprintf(stderr, "Sock fd is invalid");
-		return 0;
-	}
 
 	ssize_t bytesWrote = send(reader->getFd(), record.data() + offset, record.size() - offset, MSG_NOSIGNAL);
 

@@ -18,23 +18,22 @@ void WorkerThreadData::enqueue(AbstractConnection *connection)
 
 void WorkerThreadData::enqueue(int fd)
 {
-	AbstractConnection* conn = new HttpRequest(fd, poller, cache);
-	fprintf(stderr, "%x\n", conn);
-	enqueue(conn);
+	enqueue(new HttpRequest(fd, poller, cache));
 }
 
-void WorkerThreadData::waitWork(size_t id)
+bool WorkerThreadData::waitWork()
 {
 	pthread_mutex_t* lock = poller.getLock();
 	pthread_mutex_lock(lock);
 
-	fprintf(stderr, "Thread #%lu, lock: %X\n", id, lock);
-	while (poller.connectionsSize() == 0)
+	while (poller.connectionsSize() == 0 && !isShutdowned)
 	{
 		pthread_cond_wait(&hasWork, lock);
 	}
 
 	pthread_mutex_unlock(lock);
+
+	return !isShutdowned;
 }
 
 int WorkerThreadData::poll()

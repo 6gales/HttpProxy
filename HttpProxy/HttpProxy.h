@@ -12,7 +12,6 @@ class HttpProxy
 	Cache cache;
 
 	const size_t threadNum;
-	pthread_t *threads = nullptr;
 	std::vector<WorkerThreadData *> datas;
 
 	void work(size_t id);
@@ -43,30 +42,27 @@ private:
 public:
 	HttpProxy(short lport, size_t _threads) : threadNum(_threads), datas(_threads)
 	{
-		for (size_t i = 0; i < threadNum; i++)
+		try
 		{
-			datas[i] = new WorkerThreadData(cache);
+			ServerSocket *servSock = new ServerSocket(lport, new WorkerThreadLoadBalancer(datas));
+
+			for (size_t i = 0; i < threadNum; i++)
+			{
+				datas[i] = new WorkerThreadData(cache);
+			}
+
+			datas[0]->enqueue(servSock);
 		}
-
-		datas[0]->enqueue(new ServerSocket(lport, new WorkerThreadLoadBalancer(datas)));
-
-		threads = new pthread_t[threadNum - 1];
+		catch (std::exception &e)
+		{
+			throw e;
+		}
 	}
 
 	void run();
 
 	~HttpProxy()
 	{
-		if (threadNum > 1)
-		{
-			for (size_t i = 0; i < threadNum; i++)
-			{
-				//				pthread_cancel
-				//				pthread_join
-			}
-			delete[] threads;
-		}
-
 		for (size_t i = 0; i < threadNum; i++)
 		{
 			delete datas[i];

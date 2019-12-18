@@ -1,6 +1,32 @@
 #include "FdPoller.h"
 #include <iostream>
 
+void FdPoller::gracefulShutdown()
+{
+	pthread_mutex_lock(&connectionLock);
+
+	for (auto conn = connections.begin(); conn != connections.end(); ++conn)
+	{
+		fprintf(stderr, "Gracefuly finishing %x...\n", conn->second);
+		conn->second->gracefulShutdown();
+		if (conn->second->isFinished())
+		{
+			deleteList.push_back(conn->first);
+			fprintf(stderr, "Gracefuly finished %x\n", conn->second);
+			delete conn->second;
+		}
+	}
+
+	for (size_t i = 0; i < deleteList.size(); i++)
+	{
+		connections.erase(deleteList[i]);
+	}
+	deleteList.clear();
+
+	isChanged = true;
+	pthread_mutex_unlock(&connectionLock);
+}
+
 void FdPoller::addConnection(AbstractConnection *connection)
 {
 	pthread_mutex_lock(&connectionLock);
@@ -95,7 +121,6 @@ int FdPoller::pollFds()
 	do
 	{
 		polled = poll(subscribedFds.data(), subscribedFds.size(), -1);
-		fprintf(stderr, "Polled %d\n", polled);
 
 	} while (polled == 0);
 

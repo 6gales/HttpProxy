@@ -24,14 +24,13 @@ public:
 		: ManagingConnection(_clientFd, _manager), cache(_cache)
 	{
 		subscribedEvents = POLLIN;
-		fprintf(stderr, "hr:%d\n", subscribedEvents);
 	}
 
 	void eventTriggeredCallback(short events) override;
 
 	~HttpRequest()
 	{
-		if (eof && !readRequest)
+		if (eof && !readRequest || closeForced)
 		{
 			fprintf(stderr, "close fd\n");
 			close(sockFd);

@@ -82,9 +82,11 @@
     <ClCompile Include="Connections\DirectConnection.cpp" />
     <ClCompile Include="Connections\HttpRequest.cpp" />
     <ClCompile Include="Connections\ServerSocket.cpp" />
+    <ClCompile Include="ConsistentVector.cpp" />
     <ClCompile Include="FdPoller.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="HttpProxy.cpp" />
+    <ClCompile Include="SharedPtr.cpp" />
     <ClCompile Include="ThirdParty\picohttpparser.c" />
     <ClCompile Include="Utils\ConnectionBuffer.cpp" />
     <ClCompile Include="Utils\InetUtils.cpp" />
@@ -102,8 +104,10 @@
     <ClInclude Include="Connections\HttpRequest.h" />
     <ClInclude Include="Connections\ManagingConnection.h" />
     <ClInclude Include="Connections\ServerSocket.h" />
+    <ClInclude Include="ConsistentVector.h" />
     <ClInclude Include="FdPoller.h" />
     <ClInclude Include="HttpProxy.h" />
+    <ClInclude Include="SharedPtr.h" />
     <ClInclude Include="ThirdParty\picohttpparser.h" />
     <ClInclude Include="Utils\AbstractLoadBalancer.h" />
     <ClInclude Include="Utils\ConnectionBuffer.h" />

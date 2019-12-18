@@ -76,6 +76,7 @@ void HttpRequest::parseRequest()
 	std::pair<std::string, short> urlPort;
 	urlPort.second = -1;
 	
+	bool connectionInserted = false;
 	std::string strMethod = std::string(method, methodLen);
 	std::string http0Request = strMethod + " " + std::string(path, pathLen) + " HTTP/1.0\r\n";
 	for (size_t i = 0; i < headerNum; i++)
@@ -89,6 +90,11 @@ void HttpRequest::parseRequest()
 		}
 		else if (header == "Connection" || header == "Proxy-Connection")
 		{
+			if (connectionInserted)
+			{
+				continue;
+			}
+
 			header = "Connection";
 			value = "close";
 		}

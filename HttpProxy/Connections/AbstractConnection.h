@@ -5,6 +5,7 @@ class AbstractConnection
 {
 protected:
 	const int sockFd;
+	bool closeForced = false;
 	bool finished = false;
 	short subscribedEvents = 0;
 
@@ -41,6 +42,10 @@ public:
 	int getFd() const { return sockFd; }
 
 	bool isFinished() const { return finished; }
+
+	void forceClose() { closeForced = true; }
+
+	virtual void gracefulShutdown() {}
 
 	virtual void eventTriggeredCallback(short events) = 0;
 

@@ -34,6 +34,8 @@ public:
 
 	pthread_mutex_t *getLock() { return &connectionLock; }
 
+	void gracefulShutdown();
+
 	void addConnection(AbstractConnection *connection) override;
 
 	void removeConnection(int sockFd) override;
@@ -42,6 +44,11 @@ public:
 
 	int pollFds();
 
+	void subscriptionChanged() override
+	{
+		isChanged = true;
+	}
+
 	~FdPoller()
 	{
 		pthread_mutexattr_destroy(&recursiveAttr);
@@ -49,13 +56,15 @@ public:
 
 		for (auto it = connections.begin(); it != connections.end(); ++it)
 		{
+			it->second->forceClose();
 			delete it->second;
 		}
 		connections.clear();
-	}
 
-	void subscriptionChanged() override
-	{
-		isChanged = true;
+		for (size_t i = 0; i < insertList.size(); i++)
+		{
+			insertList[i]->forceClose();
+			delete insertList[i];
+		}
 	}
 };

@@ -14,6 +14,11 @@ public:
 
 	void eventTriggeredCallback(short events) override;
 
+	void gracefulShutdown() override
+	{
+		finished = true;
+	}
+
 	~ServerSocket()
 	{
 		close(sockFd);

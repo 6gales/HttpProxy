@@ -9,6 +9,7 @@ class WorkerThreadData
 {
 	FdPoller poller;
 	Cache &cache;
+	bool isShutdowned = false;
 
 	pthread_cond_t hasWork;
 
@@ -20,11 +21,22 @@ public:
 
 	size_t getLodaing();
 
+	void shutdown()
+	{
+		pthread_mutex_lock(poller.getLock());
+		isShutdowned = true;
+		poller.gracefulShutdown();
+		pthread_cond_signal(&hasWork);
+		fprintf(stderr, "Gracefuly s\n");
+
+		pthread_mutex_unlock(poller.getLock());
+	}
+
 	void enqueue(AbstractConnection *connection);
 
 	void enqueue(int fd);
 
-	void waitWork(size_t id);
+	bool waitWork();
 
 	int poll();
 
