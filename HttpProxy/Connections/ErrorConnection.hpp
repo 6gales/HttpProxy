@@ -1,5 +1,6 @@
 #pragma once
 #include <unistd.h>
+#include <netdb.h>
 #include <string.h>
 #include <stdio.h>
 #include <errno.h>
@@ -22,7 +23,7 @@ public:
 	{
 		if (canWrite(events))
 		{
-			ssize_t bytesWrote = send(sockFd, errorMessage.c_str() + writeOffset, errorMessage.size() - writeOffset, MSG_NOSIGNAL);
+			ssize_t bytesWrote = send(sockFd, errorMessage.c_str() + writeOffset, errorMessage.size() - writeOffset, 0);
 			if (bytesWrote < 0 && errno != EWOULDBLOCK)
 			{
 				throw std::runtime_error(std::string("send: ") + strerror(errno));

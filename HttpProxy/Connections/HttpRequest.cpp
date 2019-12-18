@@ -11,7 +11,7 @@ void HttpRequest::eventTriggeredCallback(short events)
 {
 	if (canRead(events) && !eof)
 	{
-		ssize_t bytesRead = recv(sockFd, buffer, BUFF_SIZE, MSG_NOSIGNAL);
+		ssize_t bytesRead = recv(sockFd, buffer, BUFF_SIZE, 0);
 		if (bytesRead < 0)
 		{
 			throw std::runtime_error(std::string("recv: ") + strerror(errno));

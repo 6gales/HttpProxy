@@ -20,7 +20,7 @@ ssize_t ConnectionBuffer::writeToRecord(ManagingConnection *writer)
 		}
 	}
 
-	ssize_t bytesRead = recv(writer->getFd(), buffer.data() + writeOffset[wIndex], freeSpace, MSG_NOSIGNAL);
+	ssize_t bytesRead = recv(writer->getFd(), buffer.data() + writeOffset[wIndex], freeSpace, 0);
 
 	if (bytesRead == -1)
 	{
@@ -50,7 +50,7 @@ ssize_t ConnectionBuffer::readFromRecord(ManagingConnection *reader)
 		return 0;
 	}
 
-	ssize_t bytesWrote = send(reader->getFd(), buffer.data() + readOffset, writeOffset[0] - readOffset, MSG_NOSIGNAL);
+	ssize_t bytesWrote = send(reader->getFd(), buffer.data() + readOffset, writeOffset[0] - readOffset, 0);
 
 	if (bytesWrote == -1)
 	{

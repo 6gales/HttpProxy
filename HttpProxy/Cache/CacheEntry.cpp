@@ -8,7 +8,7 @@ ssize_t CacheEntry::writeToRecord(int sockFd)
 	pthread_rwlock_wrlock(&rwlock);
 
 	char buffer[4096];
-	ssize_t bytesRead = recv(sockFd, buffer, 4096, MSG_NOSIGNAL);
+	ssize_t bytesRead = recv(sockFd, buffer, 4096, 0);
 
 	if (bytesRead > 0)
 	{
@@ -45,7 +45,7 @@ ssize_t CacheEntry::readFromRecord(ManagingConnection *reader, size_t offset)
 		return 0;
 	}
 
-	ssize_t bytesWrote = send(reader->getFd(), record.data() + offset, record.size() - offset, MSG_NOSIGNAL);
+	ssize_t bytesWrote = send(reader->getFd(), record.data() + offset, record.size() - offset, 0);
 
 	pthread_rwlock_unlock(&rwlock);
 

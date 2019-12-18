@@ -35,6 +35,7 @@ void HttpProxy::run()
 		<< "Hit twice to force shutdown" << std::endl;
 
 	proxyStatus = Running;
+	signal(SIGPIPE, SIG_IGN);
 
 	pthread_t *threads = new pthread_t[threadNum - 1];
 	ThreadInfo threadInfos[threadNum - 1];

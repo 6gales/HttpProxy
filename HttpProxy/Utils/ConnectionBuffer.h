@@ -2,15 +2,16 @@
 #include <sys/types.h>
 #include <vector>
 #include <string>
-#include "../Connections/ManagingConnection.h"
 #include <stdio.h>
+#include "../Connections/ManagingConnection.h"
+#include "ConsistentVector.hpp"
 
 #define CONN_BUFF_SIZE 4096
 
 class ConnectionBuffer
 {
 	bool isFull;
-	std::vector<char> buffer;
+	ConsistentVector<char> buffer;
 
 	ManagingConnection *waitingReader,
 		*waitingWriter;

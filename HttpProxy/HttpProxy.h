@@ -4,7 +4,6 @@
 #include <pthread.h>
 #include "Connections/ServerSocket.h"
 #include "Cache/Cache.h"
-#include "WorkerThreadData.h"
 #include "Utils/WorkerThreadLoadBalancer.hpp"
 
 class HttpProxy

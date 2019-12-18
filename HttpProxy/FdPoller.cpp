@@ -176,3 +176,36 @@ size_t FdPoller::connectionsSize()
 
 	return size;
 }
+
+void FdPoller::subscriptionChanged()
+{
+	isChanged = true;
+}
+
+FdPoller::~FdPoller()
+{
+	pthread_mutexattr_destroy(&recursiveAttr);
+	pthread_mutex_destroy(&connectionLock);
+
+	for (std::map<int, AbstractConnection *>::iterator it = connections.begin(); it != connections.end(); ++it)
+	{
+		it->second->forceClose();
+		delete it->second;
+	}
+	connections.clear();
+
+	for (size_t i = 0; i < insertList.size(); i++)
+	{
+		insertList[i]->forceClose();
+		delete insertList[i];
+	}
+}
+
+FdPoller::FdPoller()
+{
+	inForEach = false;
+	pthread_mutexattr_init(&recursiveAttr);
+	pthread_mutexattr_settype(&recursiveAttr, PTHREAD_MUTEX_RECURSIVE);
+
+	pthread_mutex_init(&connectionLock, &recursiveAttr);
+}
