@@ -1,13 +1,10 @@
 #pragma once
-
 #include <string>
-#include <unistd.h>
-#include <sys/types.h>
-#include <stdio.h>
 #include "ManagingConnection.h"
-#include "../Cache/Cache.h"
 
 #define BUFF_SIZE 1024
+
+class Cache;
 
 class HttpRequest : public ManagingConnection
 {
@@ -22,22 +19,9 @@ class HttpRequest : public ManagingConnection
 	void parseRequest();
 
 public:
-	HttpRequest(int _clientFd, ConnectionManager &_manager, Cache &_cache)
-		: ManagingConnection(_clientFd, _manager), cache(_cache)
-	{
-		readRequest = false;
-		eof = false;
-		subscribedEvents = POLLIN;
-	}
+	HttpRequest(int _clientFd, ConnectionManager &_manager, Cache &_cache);
 
 	void eventTriggeredCallback(short events);
 
-	~HttpRequest()
-	{
-		if ((eof && !readRequest) || closeForced)
-		{
-			fprintf(stderr, "close fd\n");
-			close(sockFd);
-		}
-	}
+	~HttpRequest();
 };

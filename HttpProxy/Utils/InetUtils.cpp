@@ -38,9 +38,18 @@ struct sockaddr_in getAddr(std::string host, short port)
 
 int openRedirectedSocket(std::string addr, short port)
 {
-	struct sockaddr_in redirectAddr = getAddr(addr, port);
+	struct sockaddr_in redirectAddr;
+	try
+	{
+		redirectAddr = getAddr(addr, port);
+	}
+	catch (std::exception & e)
+	{
+		throw e;
+	}
+
 	int sock = socket(AF_INET, SOCK_STREAM, 0);
-	if (sock == -1 || connect(sock, (struct sockaddr*) & redirectAddr, sizeof(redirectAddr)))
+	if (sock == -1 || connect(sock, (struct sockaddr *) & redirectAddr, sizeof(redirectAddr)))
 	{
 		throw std::runtime_error("redirecting failed");
 	}

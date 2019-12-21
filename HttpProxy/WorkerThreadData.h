@@ -1,8 +1,8 @@
 #pragma once
 #include <list>
 #include <pthread.h>
+#include "Cache/Cache.h"
 #include "FdPoller.h"
-#include "Connections/HttpRequest.h"
 
 class WorkerThreadData
 {
@@ -27,7 +27,6 @@ public:
 		isShutdowned = true;
 		poller.gracefulShutdown();
 		pthread_cond_signal(&hasWork);
-		fprintf(stderr, "Gracefuly s\n");
 
 		pthread_mutex_unlock(poller.getLock());
 	}

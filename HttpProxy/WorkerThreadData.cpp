@@ -1,4 +1,5 @@
 #include "WorkerThreadData.h"
+#include "Connections/HttpRequest.h"
 #include <stdio.h>
 
 size_t WorkerThreadData::getLoading()

@@ -4,6 +4,8 @@
 #include <algorithm>
 #include <string.h>
 #include <signal.h>
+#include "Connections/ServerSocket.h"
+#include "Utils/WorkerThreadLoadBalancer.hpp"
 
 extern HttpProxy::Status HttpProxy::proxyStatus;
 
@@ -36,6 +38,16 @@ void HttpProxy::run()
 
 	proxyStatus = Running;
 	signal(SIGPIPE, SIG_IGN);
+
+	try
+	{
+		ServerSocket *servSock = new ServerSocket(lport, new WorkerThreadLoadBalancer(datas));
+		datas[0]->enqueue(servSock);
+	}
+	catch (std::exception & e)
+	{
+		throw e;
+	}
 
 	pthread_t *threads = new pthread_t[threadNum - 1];
 	ThreadInfo threadInfos[threadNum - 1];

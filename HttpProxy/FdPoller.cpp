@@ -1,8 +1,56 @@
 #include "FdPoller.h"
 #include <stdio.h>
 #include <iostream>
+#include <vector>
+#include <map>
+#include <poll.h>
+#include "Connections/AbstractConnection.h"
+#include "Utils/ConsistentVector.hpp"
 
-void FdPoller::gracefulShutdown()
+class FdPoller::FdPollerImpl
+{
+	pthread_mutex_t connectionLock;
+	pthread_mutexattr_t recursiveAttr;
+
+	std::map<int, AbstractConnection *> connections;
+	ConsistentVector<struct pollfd> subscribedFds;
+
+	std::vector<AbstractConnection *> insertList;
+	std::vector<int> deleteList;
+
+	bool isChanged;
+	bool inForEach;
+
+	void emptyLists();
+
+public:
+	FdPollerImpl();
+
+	size_t connectionsSize();
+
+	pthread_mutex_t *getLock();
+
+	void gracefulShutdown();
+
+	void addConnection(AbstractConnection *connection);
+
+	void removeConnection(int sockFd);
+
+	bool isConnectionFinished(int sockFd);
+
+	int pollFds();
+
+	void subscriptionChanged();
+
+	~FdPollerImpl();
+};
+
+pthread_mutex_t *FdPoller::FdPollerImpl::getLock()
+{
+	return &connectionLock;
+}
+
+void FdPoller::FdPollerImpl::gracefulShutdown()
 {
 	pthread_mutex_lock(&connectionLock);
 
@@ -28,7 +76,7 @@ void FdPoller::gracefulShutdown()
 	pthread_mutex_unlock(&connectionLock);
 }
 
-void FdPoller::addConnection(AbstractConnection *connection)
+void FdPoller::FdPollerImpl::addConnection(AbstractConnection *connection)
 {
 	pthread_mutex_lock(&connectionLock);
 	isChanged = true;
@@ -52,7 +100,7 @@ void FdPoller::addConnection(AbstractConnection *connection)
 	pthread_mutex_unlock(&connectionLock);
 }
 
-void FdPoller::removeConnection(int sockFd)
+void FdPoller::FdPollerImpl::removeConnection(int sockFd)
 {
 	pthread_mutex_lock(&connectionLock);
 
@@ -69,7 +117,7 @@ void FdPoller::removeConnection(int sockFd)
 	pthread_mutex_unlock(&connectionLock);
 }
 
-bool FdPoller::isConnectionFinished(int sockFd)
+bool FdPoller::FdPollerImpl::isConnectionFinished(int sockFd)
 {
 	pthread_mutex_lock(&connectionLock);
 
@@ -84,7 +132,7 @@ bool FdPoller::isConnectionFinished(int sockFd)
 	return true;
 }
 
-void FdPoller::emptyLists()
+void FdPoller::FdPollerImpl::emptyLists()
 {
 	for (size_t i = 0; i < deleteList.size(); i++)
 	{
@@ -99,7 +147,7 @@ void FdPoller::emptyLists()
 	insertList.clear();
 }
 
-int FdPoller::pollFds()
+int FdPoller::FdPollerImpl::pollFds()
 {
 	if (isChanged)
 	{
@@ -168,7 +216,7 @@ int FdPoller::pollFds()
 	return polled;
 }
 
-size_t FdPoller::connectionsSize()
+size_t FdPoller::FdPollerImpl::connectionsSize()
 {
 	pthread_mutex_lock(&connectionLock);
 	size_t size = connections.size();
@@ -177,12 +225,12 @@ size_t FdPoller::connectionsSize()
 	return size;
 }
 
-void FdPoller::subscriptionChanged()
+void FdPoller::FdPollerImpl::subscriptionChanged()
 {
 	isChanged = true;
 }
 
-FdPoller::~FdPoller()
+FdPoller::FdPollerImpl::~FdPollerImpl()
 {
 	pthread_mutexattr_destroy(&recursiveAttr);
 	pthread_mutex_destroy(&connectionLock);
@@ -201,11 +249,61 @@ FdPoller::~FdPoller()
 	}
 }
 
-FdPoller::FdPoller()
+FdPoller::FdPollerImpl::FdPollerImpl()
 {
 	inForEach = false;
 	pthread_mutexattr_init(&recursiveAttr);
 	pthread_mutexattr_settype(&recursiveAttr, PTHREAD_MUTEX_RECURSIVE);
 
 	pthread_mutex_init(&connectionLock, &recursiveAttr);
+}
+
+pthread_mutex_t *FdPoller::getLock()
+{
+	return impl->getLock();
+}
+
+void FdPoller::gracefulShutdown()
+{
+	impl->gracefulShutdown();
+}
+
+void FdPoller::addConnection(AbstractConnection *connection)
+{
+	impl->addConnection(connection);
+}
+
+void FdPoller::removeConnection(int sockFd)
+{
+	impl->removeConnection(sockFd);
+}
+
+bool FdPoller::isConnectionFinished(int sockFd)
+{
+	return impl->isConnectionFinished(sockFd);
+}
+
+int FdPoller::pollFds()
+{
+	return impl->pollFds();
+}
+
+size_t FdPoller::connectionsSize()
+{
+	return impl->connectionsSize();
+}
+
+void FdPoller::subscriptionChanged()
+{
+	impl->subscriptionChanged();
+}
+
+FdPoller::~FdPoller()
+{
+	delete impl;
+}
+
+FdPoller::FdPoller()
+{
+	impl = new FdPollerImpl();
 }

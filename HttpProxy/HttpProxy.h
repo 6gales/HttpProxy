@@ -1,13 +1,11 @@
 #pragma once
 #include <string>
 #include <list>
-#include <pthread.h>
-#include "Connections/ServerSocket.h"
-#include "Cache/Cache.h"
-#include "Utils/WorkerThreadLoadBalancer.hpp"
+#include "WorkerThreadData.h"
 
 class HttpProxy
 {
+	short lport;
 	Cache cache;
 
 	const size_t threadNum;
@@ -39,22 +37,12 @@ private:
 	static void *startThread(void *threadInfo);
 
 public:
-	HttpProxy(short lport, size_t _threads) : threadNum(_threads), datas(_threads)
+	HttpProxy(short _lport, size_t _threads)
+		: lport(_lport), threadNum(_threads), datas(_threads)
 	{
-		try
+		for (size_t i = 0; i < threadNum; i++)
 		{
-			ServerSocket *servSock = new ServerSocket(lport, new WorkerThreadLoadBalancer(datas));
-
-			for (size_t i = 0; i < threadNum; i++)
-			{
-				datas[i] = new WorkerThreadData(cache);
-			}
-
-			datas[0]->enqueue(servSock);
-		}
-		catch (std::exception &e)
-		{
-			throw e;
+			datas[i] = new WorkerThreadData(cache);
 		}
 	}
 

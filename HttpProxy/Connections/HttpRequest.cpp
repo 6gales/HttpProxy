@@ -1,5 +1,10 @@
 #include "HttpRequest.h"
+#include <string>
+#include <unistd.h>
+#include <sys/types.h>
+#include <stdio.h>
 #include <netinet/in.h>
+#include "../Cache/Cache.h"
 #include "DirectConnection.h"
 #include "ErrorConnection.hpp"
 #include "CachingConnection.h"
@@ -106,11 +111,21 @@ void HttpRequest::parseRequest()
 	//if no HOST param
 	if (urlPort.second < 0)
 	{
-		manager.addConnection(new ErrorConnection(sockFd, "HTTP/1.0 404 Not Found\r\n\r\n"));
+		manager.addConnection(new ErrorConnection(sockFd, "HTTP/1.0 400 Bad Request\r\n\r\n"));
 		return;
 	}
 
-	int servFd = openRedirectedSocket(urlPort.first, urlPort.second);
+	int servFd;
+	try
+	{
+		servFd = openRedirectedSocket(urlPort.first, urlPort.second);
+	}
+	catch (std::exception &e)
+	{
+		fprintf(stderr, "Error occured: %s\n", e.what());
+		manager.addConnection(new ErrorConnection(sockFd, "HTTP/1.0 404 Not Found\r\n\r\n"));
+		return;
+	}
 
 	if (strMethod != "GET")
 	{
@@ -133,4 +148,21 @@ void HttpRequest::parseRequest()
 
 	manager.addConnection(new CachedConnection(sockFd, manager, entry));
 	return;
+}
+
+HttpRequest::HttpRequest(int _clientFd, ConnectionManager &_manager, Cache &_cache)
+	: ManagingConnection(_clientFd, _manager), cache(_cache)
+{
+	readRequest = false;
+	eof = false;
+	subscribedEvents = POLLIN;
+}
+
+HttpRequest::~HttpRequest()
+{
+	if ((eof && !readRequest) || closeForced)
+	{
+		fprintf(stderr, "close fd\n");
+		close(sockFd);
+	}
 }

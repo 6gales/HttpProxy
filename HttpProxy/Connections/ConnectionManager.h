@@ -1,6 +1,6 @@
 #pragma once
-#include "AbstractConnection.h"
 
+class AbstractConnection;
 class ConnectionManager
 {
 public:
