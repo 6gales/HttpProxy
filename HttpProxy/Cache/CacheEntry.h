@@ -18,7 +18,7 @@ class CacheEntry
 	void waitData(ManagingConnection *reader);
 
 public:
-	CacheEntry()
+	CacheEntry() : record(1024000)
 	{
 		isFull = false;
 		pthread_rwlock_init(&rwlock, NULL);

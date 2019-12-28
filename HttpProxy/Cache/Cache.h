@@ -9,7 +9,7 @@
 class Cache
 {
 	pthread_mutex_t cacheLock;
-	std::map<std::string, CacheEntry> cache;
+	std::map<std::string, CacheEntry*> cache;
 
 public:
 	Cache()
@@ -20,19 +20,23 @@ public:
 	bool createIfNotExists(std::string key)
 	{
 		pthread_mutex_lock(&cacheLock);
-
-		std::pair<std::map<std::string, CacheEntry>::iterator, bool> it = cache.insert(std::make_pair(key, CacheEntry()));
+		
+		std::map<std::string, CacheEntry*>::iterator it = cache.find(key);
+		if (it == cache.end())
+		{
+			cache.insert(std::make_pair(key, new CacheEntry()));
+		}
 
 		pthread_mutex_unlock(&cacheLock);
 
-		return it.second;
+		return it == cache.end();
 	}
 
-	CacheEntry &getEntry(std::string key)
+	CacheEntry *getEntry(std::string key)
 	{
 		pthread_mutex_lock(&cacheLock);
 
-		std::map<std::string, CacheEntry>::iterator it = cache.find(key);
+		std::map<std::string, CacheEntry*>::iterator it = cache.find(key);
 		if (it == cache.end())
 		{
 			pthread_mutex_unlock(&cacheLock);

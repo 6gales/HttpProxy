@@ -17,7 +17,8 @@ void HttpProxy::work(size_t id)
 	{
 		if (datas[id]->waitWork())
 		{
-			fprintf(stderr, "Thread #%lu polled %d\n", id, datas[id]->poll());
+			//fprintf(stderr, "Thread #%lu polled %d\n", id,
+			datas[id]->poll();//);
 		}
 	}
 
@@ -26,13 +27,14 @@ void HttpProxy::work(size_t id)
 
 	while (proxyStatus == GracefulShutdown && datas[id]->getLoading() > 0)
 	{
-		fprintf(stderr, "Thread #%lu polled %d\n", id, datas[id]->poll());
+		//fprintf(stderr, "Thread #%lu polled %d\n", id, 
+		datas[id]->poll();//);
 	}
 }
 
 void HttpProxy::run()
 {
-	std::cerr << "Proxy started" << std::endl
+	std::cerr << "Starting proxy on port: " << lport << std::endl
 		<< "Hit Ctrl^C for graceful shutdown" << std::endl
 		<< "Hit twice to force shutdown" << std::endl;
 

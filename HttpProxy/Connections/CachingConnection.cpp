@@ -25,12 +25,12 @@ void CachingConnection::eventTriggeredCallback(short events)
 
 	if (canRead(events))
 	{
-		ssize_t bytesRead = cacheEntry.writeToRecord(sockFd);
+		ssize_t bytesRead = cacheEntry->writeToRecord(sockFd);
 		if (bytesRead < 0)
 		{
 			throw std::runtime_error(std::string("recv: ") + strerror(errno));
 		}
 		
-		finished = bytesRead == 0;//TODO isCompleted?
+		finished = (bytesRead == 0);//TODO isCompleted?
 	}
 }

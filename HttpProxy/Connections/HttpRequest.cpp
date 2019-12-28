@@ -80,7 +80,7 @@ void HttpRequest::parseRequest()
 
 	std::pair<std::string, short> urlPort;
 	urlPort.second = -1;
-	
+
 	bool connectionInserted = false;
 	std::string strMethod = std::string(method, methodLen);
 	std::string http0Request = strMethod + " " + std::string(path, pathLen) + " HTTP/1.0\r\n";
@@ -102,6 +102,7 @@ void HttpRequest::parseRequest()
 
 			header = "Connection";
 			value = "close";
+			connectionInserted = true;
 		}
 
 		http0Request += header + ": " + value + "\r\n";
@@ -115,19 +116,34 @@ void HttpRequest::parseRequest()
 		return;
 	}
 
-	int servFd;
-	try
+	int servFd = -1;
+	bool isGet = strMethod == "GET";
+	bool isRedirectNeeded = !isGet;
+	bool isInserted = false;
+	CacheEntry *entry = NULL;
+
+	if (isGet)
 	{
-		servFd = openRedirectedSocket(urlPort.first, urlPort.second);
-	}
-	catch (std::exception &e)
-	{
-		fprintf(stderr, "Error occured: %s\n", e.what());
-		manager.addConnection(new ErrorConnection(sockFd, "HTTP/1.0 404 Not Found\r\n\r\n"));
-		return;
+		isInserted = cache.createIfNotExists(http0Request);
+		isRedirectNeeded = isInserted;
+		entry = cache.getEntry(http0Request);
 	}
 
-	if (strMethod != "GET")
+	if (isRedirectNeeded)
+	{
+		try
+		{
+			servFd = openRedirectedSocket(urlPort.first, urlPort.second);
+		}
+		catch (std::exception &e)
+		{
+			fprintf(stderr, "Error occured: %s\n", e.what());
+			manager.addConnection(new ErrorConnection(sockFd, "HTTP/1.0 404 Not Found\r\n\r\n"));
+			return;
+		}
+	}
+
+	if (!isGet)
 	{
 		SharedPtr<ConnectionBuffer> clientToServ(new ConnectionBuffer(http0Request)),
 			servToClient(new ConnectionBuffer());
@@ -136,16 +152,10 @@ void HttpRequest::parseRequest()
 		return;
 	}
 
-	bool isInserted = cache.createIfNotExists(http0Request);
-	CacheEntry &entry = cache.getEntry(http0Request);
-
 	if (isInserted)
 	{
 		manager.addConnection(new CachingConnection(servFd, http0Request, entry));
-		manager.addConnection(new CachedConnection(sockFd, manager, entry));
-		return;
 	}
-
 	manager.addConnection(new CachedConnection(sockFd, manager, entry));
 	return;
 }
