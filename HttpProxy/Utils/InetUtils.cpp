@@ -55,14 +55,14 @@ int openRedirectedSocket(std::string addr, short port)
 	{
 		throw std::runtime_error("socket failed");
 	}
+	if (connect(sock, (struct sockaddr *) & redirectAddr, sizeof(redirectAddr)))
+	{
+		throw std::runtime_error("redirecting failed");
+	}
 	if (fcntl(sock, F_SETFL, fcntl(sock, F_GETFL, 0) | O_NONBLOCK) == -1)
 	{
 		close(sock);
 		throw std::runtime_error("fcnt: cannot make server socket nonblock");
-	}
-	if (connect(sock, (struct sockaddr *) & redirectAddr, sizeof(redirectAddr)))
-	{
-		throw std::runtime_error("redirecting failed");
 	}
 	return sock;
 }
