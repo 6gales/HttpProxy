@@ -1,6 +1,8 @@
 #include "InetUtils.h"
 #include <stdexcept>
 #include <string.h>
+#include <fcntl.h>
+#include <unistd.h>
 
 struct sockaddr_in getAddr(std::string host, short port)
 {
@@ -49,7 +51,16 @@ int openRedirectedSocket(std::string addr, short port)
 	}
 
 	int sock = socket(AF_INET, SOCK_STREAM, 0);
-	if (sock == -1 || connect(sock, (struct sockaddr *) & redirectAddr, sizeof(redirectAddr)))
+	if (sock == -1)
+	{
+		throw std::runtime_error("socket failed");
+	}
+	if (fcntl(sock, F_SETFL, fcntl(sock, F_GETFL, 0) | O_NONBLOCK) == -1)
+	{
+		close(sock);
+		throw std::runtime_error("fcnt: cannot make server socket nonblock");
+	}
+	if (connect(sock, (struct sockaddr *) & redirectAddr, sizeof(redirectAddr)))
 	{
 		throw std::runtime_error("redirecting failed");
 	}

@@ -16,11 +16,6 @@ ServerSocket::ServerSocket(short port, AbstractLoadBalancer *_loadBalancer)
 	{
 		throw std::runtime_error(std::string("socket: ") + strerror(errno));
 	}
-	if (sockFd >= FD_SETSIZE)
-	{
-		close(sockFd);
-		throw std::runtime_error(std::string("socket fd is out of select range"));
-	}
 	
 	int opt = 1;
 	setsockopt(sockFd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
