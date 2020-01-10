@@ -1,6 +1,5 @@
 #pragma once
 #include <map>
-#include <vector>
 #include <string>
 #include <unistd.h>
 #include "../Cache/CacheEntry.h"
@@ -16,18 +15,20 @@ class CachingConnection : public AbstractConnection
 	bool eof;
 
 public:
-	CachingConnection(int _sockFd, std::string _request, CacheEntry *_cacheEntry)
+	CachingConnection(int _sockFd, const std::string &_request, CacheEntry *_cacheEntry)
 		: AbstractConnection(_sockFd), request(_request), cacheEntry(_cacheEntry)
 	{
 		writeOffset = 0;
 		eof = false;
-		subscribedEvents = POLLIN | POLLOUT;
+		subscribedEvents = POLLOUT;
+		cacheEntry->setWriter(true);
 	}
 
 	void eventTriggeredCallback(short events);
 
 	~CachingConnection()
 	{
+		cacheEntry->setWriter(false);
 		close(sockFd);
 	}
 };

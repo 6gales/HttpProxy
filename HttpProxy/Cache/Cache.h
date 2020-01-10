@@ -1,6 +1,5 @@
 #pragma once
 #include <map>
-#include <vector>
 #include <string>
 #include <pthread.h>
 #include <stdexcept>
@@ -22,14 +21,22 @@ public:
 		pthread_mutex_lock(&cacheLock);
 		
 		std::map<std::string, CacheEntry*>::iterator it = cache.find(key);
-		if (it == cache.end())
+		bool found = it != cache.end();
+
+		if (found && it->second->isInvalid())
+		{
+			delete it->second;
+			found = false;
+		}
+		
+		if (!found)
 		{
 			cache.insert(std::make_pair(key, new CacheEntry()));
 		}
 
 		pthread_mutex_unlock(&cacheLock);
 
-		return it == cache.end();
+		return !found;
 	}
 
 	CacheEntry *getEntry(std::string key)
@@ -51,5 +58,9 @@ public:
 	~Cache()
 	{
 		pthread_mutex_destroy(&cacheLock);
+		for (std::map<std::string, CacheEntry*>::iterator it = cache.begin(); it != cache.end(); ++it)
+		{
+			delete it->second;
+		}
 	}
 };

@@ -146,7 +146,7 @@ void HttpRequest::parseRequest()
 	if (!isGet)
 	{
 		SharedPtr<ConnectionBuffer> clientToServ(new ConnectionBuffer(http0Request)),
-			servToClient(new ConnectionBuffer());
+									servToClient(new ConnectionBuffer());
 		manager.addConnection(new DirectConnection(sockFd, clientToServ, servToClient, manager));
 		manager.addConnection(new DirectConnection(servFd, servToClient, clientToServ, manager));
 		return;

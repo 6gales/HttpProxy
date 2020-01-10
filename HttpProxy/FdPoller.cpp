@@ -196,7 +196,10 @@ int FdPoller::FdPollerImpl::pollFds()
 			fprintf(stderr, "Polling %d with options %s\n", subscribedFds[i].fd, getEventsStr(subscribedFds[i].events).c_str());
 		}*/
 		polled = poll(subscribedFds.data(), subscribedFds.size(), -1);
-	//	fprintf(stderr, "Polled %d\n", polled);
+		if (polled == 0 || polled > 1)
+		{
+			fprintf(stderr, "Polled %d\n", polled);
+		}
 		/*for (size_t i = 0; i < subscribedFds.size(); i++)
 		{
 			fprintf(stderr, "Polled %d with options: %s\n", subscribedFds[i].fd, getEventsStr(subscribedFds[i].revents).c_str());

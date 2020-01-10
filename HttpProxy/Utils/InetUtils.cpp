@@ -4,7 +4,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-struct sockaddr_in getAddr(std::string host, short port)
+struct sockaddr_in getAddr(const std::string &host, short port)
 {
 	struct sockaddr_in sockAddr;
 	struct addrinfo *addr = NULL;
@@ -26,7 +26,7 @@ struct sockaddr_in getAddr(std::string host, short port)
 		}
 		memcpy(&sockAddr, addr->ai_addr, sizeof(struct sockaddr));
 		freeaddrinfo(addr);
-    }
+	}
 	else
 	{
 		sockAddr.sin_addr.s_addr = htonl(INADDR_ANY);
@@ -38,7 +38,7 @@ struct sockaddr_in getAddr(std::string host, short port)
 	return sockAddr;
 }
 
-int openRedirectedSocket(std::string addr, short port)
+int openRedirectedSocket(const std::string &addr, short port)
 {
 	struct sockaddr_in redirectAddr;
 	try
@@ -55,19 +55,19 @@ int openRedirectedSocket(std::string addr, short port)
 	{
 		throw std::runtime_error("socket failed");
 	}
-	if (connect(sock, (struct sockaddr *) & redirectAddr, sizeof(redirectAddr)))
+	if (connect(sock, (struct sockaddr *)&redirectAddr, sizeof(redirectAddr)))
 	{
 		throw std::runtime_error("redirecting failed");
 	}
 	if (fcntl(sock, F_SETFL, fcntl(sock, F_GETFL, 0) | O_NONBLOCK) == -1)
 	{
 		close(sock);
-		throw std::runtime_error("fcnt: cannot make server socket nonblock");
+		throw std::runtime_error("fcntl: cannot make server socket nonblock");
 	}
 	return sock;
 }
 
-std::pair<std::string, short> parseHost(std::string host)
+std::pair<std::string, short> parseHost(const std::string &host)
 {
 	short port = 0;
 	size_t pos = host.find(':', 0);

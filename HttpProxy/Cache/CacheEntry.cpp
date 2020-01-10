@@ -1,7 +1,5 @@
 #include "CacheEntry.h"
 #include <netdb.h>
-#include <fcntl.h>
-#include <stdio.h>
 
 ssize_t CacheEntry::writeToRecord(int sockFd)
 {
@@ -9,22 +7,23 @@ ssize_t CacheEntry::writeToRecord(int sockFd)
 
 	char buffer[1024000];
 	ssize_t bytesRead = recv(sockFd, buffer, 1024000, 0);
-
-	if (bytesRead > 0)
+	if (bytesRead == -1)
 	{
-		for (size_t i = 0; i < bytesRead; i++)
-		{
-			record.push_back(buffer[i]);
-		}
-
-		wakeUpConnections();
+		return bytesRead;
 	}
-	else if (bytesRead == 0)
+	
+	for (size_t i = 0; i < bytesRead; i++)
+	{
+		record.push_back(buffer[i]);
+	}
+
+	if (bytesRead == 0)
 	{
 		isFull = true;
-//		record.shrink_to_fit();
-		wakeUpConnections();
+		//		record.shrink_to_fit();
 	}
+	
+	wakeUpConnections();
 
 	pthread_rwlock_unlock(&rwlock);
 	
@@ -97,4 +96,24 @@ bool CacheEntry::isCompleted()
 	pthread_rwlock_unlock(&rwlock);
 
 	return status;
+}
+
+bool CacheEntry::isInvalid()
+{
+	pthread_rwlock_rdlock(&rwlock);
+
+	bool status = !(isFull || hasWriter);
+
+	pthread_rwlock_unlock(&rwlock);
+
+	return status;
+}
+
+void CacheEntry::setWriter(bool _hasWriter)
+{
+	pthread_rwlock_rdlock(&rwlock);
+
+	hasWriter = _hasWriter;
+
+	pthread_rwlock_unlock(&rwlock);
 }

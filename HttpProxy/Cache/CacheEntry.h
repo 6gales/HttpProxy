@@ -10,6 +10,7 @@ class CacheEntry
 	pthread_rwlock_t rwlock;
 
 	bool isFull;
+	bool hasWriter;
 	ConsistentVector<char> record;
 
 	std::vector<ManagingConnection*> readers;
@@ -21,10 +22,14 @@ public:
 	CacheEntry() : record(1024000)
 	{
 		isFull = false;
+		hasWriter = true;
 		pthread_rwlock_init(&rwlock, NULL);
 	}
 
 	bool isCompleted();
+	bool isInvalid();
+	
+	void setWriter(bool _hasWriter);
 
 	size_t recordSize();
 
