@@ -99,7 +99,7 @@ void SharedPtr<T>::reset(T *newPtr)
 }
 
 template<class T>
-inline size_t AtomicRefCounter<T>::atomicIncrementAndGet()
+size_t AtomicRefCounter<T>::atomicIncrementAndGet()
 {
 	pthread_mutex_lock(&lock);
 	size_t val = ++counter;

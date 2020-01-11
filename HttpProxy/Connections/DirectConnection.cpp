@@ -4,9 +4,22 @@
 #include <netdb.h>
 #include <stdexcept>
 #include <errno.h>
+#include "../Utils/InetUtils.h"
 
 void DirectConnection::eventTriggeredCallback(short events)
 {
+	if (!isConnected)
+	{
+		try
+		{
+			isConnected = checkIfConnected(sockFd);
+		}
+		catch (std::exception &e)
+		{
+			throw e;
+		}
+	}
+	
 	if (isHangedUp(events) || isErrorOccuerd(events) || isInvalid(events))
 	{
 		fprintf(stderr, "Client disconnected\n");

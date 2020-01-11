@@ -13,6 +13,7 @@ class CachingConnection : public AbstractConnection
 	size_t writeOffset;
 
 	bool eof;
+	bool isConnected;
 
 public:
 	CachingConnection(int _sockFd, const std::string &_request, CacheEntry *_cacheEntry)
@@ -20,6 +21,7 @@ public:
 	{
 		writeOffset = 0;
 		eof = false;
+		isConnected = false;
 		subscribedEvents = POLLOUT;
 		cacheEntry->setWriter(true);
 	}

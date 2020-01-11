@@ -22,7 +22,7 @@ class FdPoller::FdPollerImpl
 	bool inForEach;
 
 	void emptyLists();
-	std::string getEventsStr(short events);
+
 public:
 	FdPollerImpl();
 
@@ -147,28 +147,6 @@ void FdPoller::FdPollerImpl::emptyLists()
 	insertList.clear();
 }
 
-std::string FdPoller::FdPollerImpl::getEventsStr(short events)
-{
-	std::string result = "\"";
-	if (events & POLLIN)
-		result += "read ";
-	if (events & POLLOUT)
-		result += "write ";
-
-	if (events & POLLHUP)
-		result += "hanged_up ";
-
-	if (events & POLLERR)
-		result += "error ";
-
-	if (events & POLLNVAL)
-		result += "inval";
-	
-	result += ";";
-
-	return result;
-}
-
 int FdPoller::FdPollerImpl::pollFds()
 {
 	if (isChanged)
@@ -188,25 +166,11 @@ int FdPoller::FdPollerImpl::pollFds()
 	}
 
 	int polled;
-//	fprintf(stderr, "+-+-+-+-+-+-+-+-+-+-+-+-\n");
 	do
 	{
-	/*	for (size_t i = 0; i < subscribedFds.size(); i++)
-		{
-			fprintf(stderr, "Polling %d with options %s\n", subscribedFds[i].fd, getEventsStr(subscribedFds[i].events).c_str());
-		}*/
 		polled = poll(subscribedFds.data(), subscribedFds.size(), -1);
-		if (polled == 0 || polled > 1)
-		{
-			fprintf(stderr, "Polled %d\n", polled);
-		}
-		/*for (size_t i = 0; i < subscribedFds.size(); i++)
-		{
-			fprintf(stderr, "Polled %d with options: %s\n", subscribedFds[i].fd, getEventsStr(subscribedFds[i].revents).c_str());
-		}*/
 
 	} while (polled == 0);
-//	fprintf(stderr, "+-+-+-+-+-+-+-+-+-+-+-+-\n");
 
 	if (polled > 0)
 	{

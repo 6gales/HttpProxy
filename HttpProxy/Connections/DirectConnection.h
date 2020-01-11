@@ -10,6 +10,7 @@
 class DirectConnection : public ManagingConnection
 {
 	SharedPtr<ConnectionBuffer> fromThis, toThis;
+	bool isConnected;
 
 public:
 	DirectConnection(int _sockFd,
@@ -19,6 +20,7 @@ public:
 					: ManagingConnection(_sockFd, manager),
 					fromThis(_fromThis), toThis(_toThis)
 	{
+		isConnected = false;
 		subscribedEvents = POLLIN | POLLOUT;
 		manager.subscriptionChanged();
 	}

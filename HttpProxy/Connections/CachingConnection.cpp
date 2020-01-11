@@ -3,11 +3,21 @@
 #include <netdb.h>
 #include <stdexcept>
 #include <errno.h>
-#include <stdio.h>
+#include "../Utils/InetUtils.h"
 
 void CachingConnection::eventTriggeredCallback(short events)
 {
-	bool isUseful = false;
+	if (!isConnected)
+	{
+		try
+		{
+			isConnected = checkIfConnected(sockFd);
+		}
+		catch (std::exception &e)
+		{
+			throw e;
+		}
+	}
 	
 	if (canWrite(events) && request.size() != writeOffset)
 	{
@@ -16,16 +26,7 @@ void CachingConnection::eventTriggeredCallback(short events)
 		{
 			throw std::runtime_error(std::string("send: ") + strerror(errno));
 		}
-		/////////////////////
-		if (bytesWrote > 0)
-		{
-			isUseful = true;
-		}
-		else
-		{
-			fprintf(stderr, "caching conn wrote %d bytes\n", bytesWrote);
-		}
-		/////////////////////
+
 		writeOffset += bytesWrote;
 
 		if (request.size() == writeOffset)
@@ -41,21 +42,7 @@ void CachingConnection::eventTriggeredCallback(short events)
 		{
 			throw std::runtime_error(std::string("recv: ") + strerror(errno));
 		}
-		/////////////////
-		if (bytesRead > 0)
-		{
-			isUseful = true;
-		}
-		else
-		{
-			fprintf(stderr, "caching conn read %d bytes\n", bytesRead);
-		}
-		
-		finished = (bytesRead == 0);//TODO isCompleted?
-	}
 
-	if (!isUseful)
-	{
-		fprintf(stderr, "Useless iteration\n");
+		finished = (bytesRead == 0);//TODO isCompleted?
 	}
 }

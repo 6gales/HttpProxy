@@ -3,6 +3,10 @@
 #include <string.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <errno.h>
+#include <stdio.h>
 
 struct sockaddr_in getAddr(const std::string &host, short port)
 {
@@ -55,15 +59,18 @@ int openRedirectedSocket(const std::string &addr, short port)
 	{
 		throw std::runtime_error("socket failed");
 	}
-	if (connect(sock, (struct sockaddr *)&redirectAddr, sizeof(redirectAddr)))
-	{
-		throw std::runtime_error("redirecting failed");
-	}
 	if (fcntl(sock, F_SETFL, fcntl(sock, F_GETFL, 0) | O_NONBLOCK) == -1)
 	{
 		close(sock);
 		throw std::runtime_error("fcntl: cannot make server socket nonblock");
 	}
+
+	int errorCode = connect(sock, (struct sockaddr*) & redirectAddr, sizeof(redirectAddr));
+	if (errorCode != 0 && errno != EINPROGRESS)
+	{
+		throw std::runtime_error("redirecting failed");
+	}
+
 	return sock;
 }
 
@@ -89,4 +96,17 @@ std::pair<std::string, short> parseHost(const std::string &host)
 	}
 	
 	return std::make_pair(url, port);
+}
+
+bool checkIfConnected(int sockFd)
+{
+	size_t isConnected = 0;
+	socklen_t len = sizeof(isConnected);
+	getsockopt(sockFd, SOL_SOCKET, SO_ERROR, &isConnected, &len);
+	if (isConnected != 0 && isConnected != EINPROGRESS)
+	{
+		throw std::runtime_error("connection failed");
+	}
+
+	return isConnected != EINPROGRESS;
 }
